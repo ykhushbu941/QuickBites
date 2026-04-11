@@ -17,6 +17,8 @@ import SavedPage from "./pages/SavedPage";
 import TopBar from "./components/TopBar";
 import BottomNavigation from "./components/BottomNavigation";
 
+import LandingPage from "./pages/LandingPage";
+
 // 🔐 Protected Route (User must be logged in)
 function ProtectedRoute({ children }) {
   const { token, loading } = useContext(AuthContext);
@@ -44,11 +46,8 @@ export default function App() {
       <TopBar />
 
       <Routes>
-        {/* Default Route */}
-        <Route
-          path="/"
-          element={<Navigate to="/home" />}
-        />
+        {/* Splash / Landing */}
+        <Route path="/" element={<LandingPage />} />
 
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
