@@ -54,7 +54,7 @@ export default function HomePage() {
       if (vegFilter === "nonveg") params.set("isVeg", "false");
       params.set("limit", "40");
 
-      const res = await axios.get(`http://localhost:5000/api/foods?${params.toString()}`);
+      const res = await axios.get(`/api/foods?${params.toString()}`);
       setFoods(res.data);
     } catch (err) {
       console.error("Failed to fetch foods", err);

@@ -13,7 +13,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/orders");
+        const res = await axios.get("/api/orders");
         setOrders(res.data);
       } catch (err) {
         console.error("Failed to fetch orders");
@@ -26,7 +26,7 @@ export default function ProfilePage() {
 
   const cancelOrder = async (orderId) => {
     try {
-      const res = await axios.put(`http://localhost:5000/api/orders/${orderId}/cancel`);
+      const res = await axios.put(`/api/orders/${orderId}/cancel`);
       setOrders(orders.map(o => o._id === orderId ? { ...o, status: res.data.status } : o));
     } catch (err) {
       alert(err.response?.data?.msg || "Failed to cancel order");

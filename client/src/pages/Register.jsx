@@ -15,7 +15,7 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/user/register", user);
+      await axios.post("/api/auth/user/register", user);
       navigate("/login");
     } catch (err) {
       console.error(err);

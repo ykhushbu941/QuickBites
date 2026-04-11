@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/auth/user/me");
+      const res = await axios.get("/api/auth/user/me");
       setUser(res.data);
     } catch (error) {
       console.error("Token invalid or expired");

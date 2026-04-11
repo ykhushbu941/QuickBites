@@ -29,7 +29,7 @@ export default function CartPage() {
         deliveryAddress: user?.address || "Default Address"
       };
 
-      await axios.post("http://localhost:5000/api/orders", orderData);
+      await axios.post("/api/orders", orderData);
       clearCart();
       alert("Order placed successfully!");
       navigate("/profile");

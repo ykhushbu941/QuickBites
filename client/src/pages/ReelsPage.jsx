@@ -79,7 +79,7 @@ const Reel = ({ food, isActive }) => {
 
   const toggleLike = async () => {
     try {
-      await axios.post(`http://localhost:5000/api/foods/like/${food._id}`);
+      await axios.post(`/api/foods/like/${food._id}`);
       setIsLiked(prev => !prev);
       setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
     } catch {
@@ -90,7 +90,7 @@ const Reel = ({ food, isActive }) => {
   const toggleSave = async (e) => {
     e.stopPropagation();
     try {
-      await axios.post(`http://localhost:5000/api/auth/user/save/${food._id}`);
+      await axios.post(`/api/auth/user/save/${food._id}`);
       setIsSaved(prev => !prev);
       showToast(isSaved ? "Removed from Saved" : "Reel Saved! 🔖");
       if (fetchUser) fetchUser();
@@ -119,7 +119,7 @@ const Reel = ({ food, isActive }) => {
     e.preventDefault();
     if (!newComment.trim()) return;
     try {
-      const res = await axios.post(`http://localhost:5000/api/foods/comment/${food._id}`, { text: newComment });
+      const res = await axios.post(`/api/foods/comment/${food._id}`, { text: newComment });
       setComments(res.data);
       setNewComment("");
       showToast("Comment posted!");
@@ -347,7 +347,7 @@ export default function ReelsPage() {
 
   const fetchFoods = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/foods?limit=40");
+      const res = await axios.get("/api/foods?limit=40");
       setFoods(res.data);
     } catch {
       console.error("Error loading foods");

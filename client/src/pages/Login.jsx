@@ -19,7 +19,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/user/login", { email, password });
+      const res = await axios.post("/api/auth/user/login", { email, password });
 
       // Enforce correct portal
       if (res.data.role !== loginType) {

@@ -19,7 +19,7 @@ export default function AddFood() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/foods", food);
+      await axios.post("/api/foods", food);
       alert("Reel and Food added successfully! 🎉");
       navigate("/reels");
     } catch (err) {

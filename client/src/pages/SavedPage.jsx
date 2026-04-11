@@ -16,7 +16,7 @@ export default function SavedPage() {
 
   const fetchSavedFoods = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/auth/user/me");
+      const res = await axios.get("/api/auth/user/me");
       // The backend populates savedFoods array
       setFoods(res.data.savedFoods || []);
     } catch (err) {
@@ -29,7 +29,7 @@ export default function SavedPage() {
   const removeSaved = async (id, e) => {
     e.stopPropagation();
     try {
-      await axios.put(`http://localhost:5000/api/auth/user/save/${id}`);
+      await axios.put(`/api/auth/user/save/${id}`);
       setFoods(foods.filter(f => f._id !== id));
     } catch (err) {
       console.error("Failed to remove saved food");

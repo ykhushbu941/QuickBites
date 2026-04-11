@@ -7,7 +7,7 @@ export default function VideoCard({ food }) {
 
   const like = async () => {
     await axios.post(
-      `http://localhost:5000/api/foods/like/${food._id}`,
+      `/api/foods/like/${food._id}`,
       {},
       { headers: { Authorization: token } }
     );

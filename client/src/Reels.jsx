@@ -7,7 +7,7 @@ export default function Reels() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/foods")
+      .get("/api/foods")
       .then((res) => setFoods(res.data))
       .catch((err) => {
         console.error(err);

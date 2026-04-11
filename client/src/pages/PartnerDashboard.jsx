@@ -12,7 +12,7 @@ export default function PartnerDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/orders/partner");
+      const res = await axios.get("/api/orders/partner");
       setOrders(res.data);
     } catch (err) {
       console.error("Failed to fetch partner orders", err);
@@ -23,7 +23,7 @@ export default function PartnerDashboard() {
 
   const updateStatus = async (orderId, newStatus) => {
     try {
-      const res = await axios.put(`http://localhost:5000/api/orders/${orderId}/status`, { status: newStatus });
+      const res = await axios.put(`/api/orders/${orderId}/status`, { status: newStatus });
       setOrders(orders.map(o => o._id === orderId ? { ...o, status: res.data.status } : o));
     } catch (err) {
       alert("Failed to update status");
