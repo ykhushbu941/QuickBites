@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { LogOut, MapPin, ChevronDown } from "lucide-react";
+import { LogOut, MapPin, ChevronDown, Utensils } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export default function TopBar() {
@@ -22,7 +22,7 @@ export default function TopBar() {
   };
 
   return (
-    <div className={`fixed top-0 w-full glass-panel h-16 z-40 bg-brand-dark/98 border-b border-white/5 ${isReels ? 'hidden md:block' : ''}`}>
+    <div className={`fixed top-0 w-full glass-panel h-16 z-50 bg-brand-dark/98 border-b border-white/5 ${isReels ? 'hidden md:block' : ''}`}>
       <div className="flex justify-between items-center h-full px-4 md:px-8 max-w-md md:max-w-7xl mx-auto relative">
         
         {/* Left Side: Location */}
@@ -50,7 +50,13 @@ export default function TopBar() {
 
         {/* Center: Brand */}
         <div className="absolute left-1/2 -translate-x-1/2 z-0">
-          <h1 className="font-extrabold text-xl md:text-2xl tracking-tight text-white cursor-pointer" onClick={() => navigate('/home')}>QuickBites</h1>
+          <div 
+             className="flex items-center gap-2 cursor-pointer group"
+             onClick={() => navigate('/home')}
+          >
+            <Utensils className="w-5 h-5 md:w-6 md:h-6 text-[#FC8019]" />
+            <h1 className="font-extrabold text-xl md:text-2xl tracking-tight text-white">QuickBites</h1>
+          </div>
         </div>
         
         {/* Right Side: Profile & Logout */}

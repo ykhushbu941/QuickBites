@@ -5,15 +5,9 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-[100dvh] w-full bg-gradient-to-br from-[#1C1C1C] to-[#0A0A0A] flex flex-col justify-between p-6 relative z-50">
+    <div className="min-h-[100dvh] w-full bg-gradient-to-br from-[#1C1C1C] to-[#0A0A0A] flex flex-col justify-between p-6 relative z-10 pt-20">
       
-      {/* Top Header */}
-      <div className="flex justify-center items-center mt-4">
-        <div className="flex items-center gap-2 text-[#FC8019]">
-          <Utensils className="w-8 h-8" />
-          <span className="font-extrabold text-2xl tracking-tight text-white">QuickBites</span>
-        </div>
-      </div>
+      {/* Hero Content - the old header was removed to avoid double branding */}
 
       {/* Hero Content */}
       <div className="flex-1 flex flex-col md:flex-row justify-center items-center text-center md:text-left max-w-sm md:max-w-5xl mx-auto md:w-full md:gap-16 lg:gap-32">
