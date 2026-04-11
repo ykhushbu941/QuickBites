@@ -11,6 +11,7 @@ export default function TopBar() {
   // Hide TopBar entirely on auth pages
   if (["/login", "/register"].includes(location.pathname)) return null;
   const isReels = location.pathname === "/reels";
+  const isLanding = location.pathname === "/";
 
   const handleLogout = () => {
     logout();
@@ -26,7 +27,7 @@ export default function TopBar() {
       <div className="flex justify-between items-center h-full px-4 md:px-8 max-w-md md:max-w-7xl mx-auto relative">
         
         {/* Left Side: Location */}
-        <div className="flex items-center space-x-6 z-10">
+        <div className={`flex items-center space-x-6 z-10 ${isLanding ? 'invisible' : ''}`}>
             <div 
                className="flex flex-col justify-center cursor-pointer hover:opacity-80 transition-opacity"
                onClick={() => {
@@ -60,7 +61,7 @@ export default function TopBar() {
         </div>
         
         {/* Right Side: Profile & Logout */}
-        {user && (
+        {user && !isLanding && (
           <div className="flex items-center space-x-4 sm:space-x-3 z-10">
              <div 
                className="w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold text-sm sm:text-xs shadow-md shadow-brand-primary/20 cursor-pointer"
