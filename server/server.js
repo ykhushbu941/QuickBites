@@ -44,49 +44,18 @@ if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "deploy") 
   });
 }
 
-// 🌐 Database Connection + Server Start
-const PORT = process.env.PORT || 5000;
-
+// 🌐 Database Connection
 mongoose.connect(process.env.MONGO_URI)
-.then(async () => {
-  console.log("✅ MongoDB Connected");
+.then(() => console.log("✅ MongoDB Connected"))
+.catch((err) => console.error("❌ DB Connection Error:", err.message));
 
-  // 🌱 Seed data (ONLY if DB empty)
-  const count = await Food.countDocuments();
-
-  if (count === 0) {
-    await Food.insertMany([
-      {
-        name: "Cheese Burger",
-        videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-        price: 199,
-        restaurant: "Burger King",
-        likes: []
-      },
-      {
-        name: "Pizza",
-        videoUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-        price: 299,
-        restaurant: "Dominos",
-        likes: []
-      },
-      {
-        name: "Pasta",
-        videoUrl: "https://www.w3schools.com/html/movie.mp4",
-        price: 249,
-        restaurant: "Italiano",
-        likes: []
-      }
-    ]);
-
-    console.log("🌱 Sample food data inserted");
-  }
-
+// Only run listen() if we are NOT on Vercel
+if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "deploy") {
+  const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
+}
 
-})
-.catch((err) => {
-  console.error("❌ DB Connection Error:", err.message);
-});
+// Export for Vercel Serverless Function
+module.exports = app;
