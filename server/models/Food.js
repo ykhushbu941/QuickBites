@@ -49,7 +49,7 @@ const foodSchema = new mongoose.Schema(
     cuisine: {
       type: String,
       default: "Other",
-      enum: ["Indian", "South Indian", "Chinese", "Italian", "Mexican", "American", "Japanese", "Other"]
+      enum: ["Indian", "South Indian", "Chinese", "Italian", "Mexican", "American", "Japanese", "Healthy", "Mediterranean", "Other"]
     },
 
     // 👤 who added this (partner)

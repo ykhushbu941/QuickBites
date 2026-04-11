@@ -6,12 +6,13 @@ import NearbyRestaurants from "../components/NearbyRestaurants";
 import FoodDetailModal from "../components/FoodDetailModal";
 import { CartContext } from "../context/CartContext";
 
-const CATEGORIES = ["All", "Pizza", "Burger", "Dessert", "Drinks", "Other"];
-const CUISINES = ["All", "Indian", "South", "Chinese", "Italian", "Mexican", "American", "Japanese"];
+const CATEGORIES = ["All", "Pizza", "Burger", "Dessert", "Drinks", "Snacks", "Healthy", "Other"];
+const CUISINES = ["All", "Indian", "South Indian", "Chinese", "Italian", "Mexican", "American", "Japanese", "Healthy", "Mediterranean"];
 
 const CUISINE_ICONS = {
-  All: "🌎", Indian: "🇮🇳", "South": "🌴", Chinese: "🏮",
-  Italian: "🍕", Mexican: "🌮", American: "🍔", Japanese: "🍣"
+  All: "🌎", "Indian": "🇮🇳", "South Indian": "🍛", "Chinese": "🏮",
+  "Italian": "🍕", "Mexican": "🌮", "American": "🍔", "Japanese": "🍣",
+  "Healthy": "🥗", "Mediterranean": "🥙"
 };
 
 export default function HomePage() {
