@@ -38,8 +38,8 @@ export default function PartnerDashboard() {
         disabled={isActive || order.status === "Cancelled"}
         className={`flex-1 flex flex-col items-center justify-center p-2 rounded-xl text-xs font-semibold transition-all ${
           isActive 
-            ? `${colorClass} shadow-lg scale-105` 
-            : "bg-white/5 text-gray-500 hover:bg-white/10"
+            ? `${colorClass} shadow-lg scale-105 text-white` 
+            : "bg-[var(--text-primary)]/5 text-[var(--text-secondary)] hover:bg-[var(--text-primary)]/10"
         } ${order.status === "Cancelled" ? "opacity-30 cursor-not-allowed" : ""}`}
       >
         <Icon className="w-5 h-5 mb-1" />
@@ -49,57 +49,57 @@ export default function PartnerDashboard() {
   };
 
   return (
-    <div className="max-w-md md:max-w-6xl mx-auto min-h-screen px-4 py-6 pb-24">
+    <div className="max-w-md md:max-w-6xl mx-auto min-h-screen px-4 py-8 pb-24 bg-[var(--bg-primary)] transition-colors duration-300">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-1">Partner Dashboard</h1>
-        <p className="text-brand-primary text-sm font-medium">Manage incoming orders</p>
+        <h1 className="text-2xl font-black text-[var(--text-primary)] mb-1">Partner Dashboard</h1>
+        <p className="text-[var(--brand-orange)] text-sm font-black uppercase tracking-widest">Manage incoming orders</p>
       </div>
 
       {loading ? (
         <div className="space-y-4 animate-pulse">
-           {[1,2,3].map(i => <div key={i} className="h-40 bg-brand-gray/50 rounded-2xl"></div>)}
+           {[1,2,3].map(i => <div key={i} className="h-40 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)]"></div>)}
         </div>
       ) : orders.length === 0 ? (
-        <div className="glass-panel p-8 text-center rounded-2xl mt-12 bg-black/40">
-           <Package className="w-16 h-16 text-brand-primary/50 mx-auto mb-4" />
-           <h2 className="text-xl font-bold text-white mb-2">No active orders</h2>
-           <p className="text-gray-400 text-sm">When users order your dishes, they will appear here for you to manage.</p>
+        <div className="bg-[var(--bg-surface)] p-12 text-center rounded-[2.5rem] border border-[var(--border-color)] shadow-xl mt-12">
+           <Package className="w-16 h-16 text-[var(--brand-orange)]/50 mx-auto mb-4" />
+           <h2 className="text-xl font-black text-[var(--text-primary)] mb-2">No active orders</h2>
+           <p className="text-[var(--text-secondary)] text-sm font-medium">When users order your dishes, they will appear here for you to manage.</p>
         </div>
       ) : (
         <div className="space-y-5 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6">
           {orders.map((order) => (
-            <div key={order._id} className={`glass-panel p-5 rounded-2xl border-l-4 h-full flex flex-col justify-between ${
-              order.status === 'Cancelled' ? 'border-l-red-500 bg-red-900/10 opacity-75' : 'border-l-brand-primary'
+            <div key={order._id} className={`bg-[var(--bg-surface)] p-5 rounded-[2rem] border-l-[6px] h-full flex flex-col justify-between shadow-xl shadow-black/[0.02] border border-[var(--border-color)] transition-all ${
+              order.status === 'Cancelled' ? 'border-l-red-500 bg-red-500/[0.03] opacity-75' : 'border-l-[var(--brand-orange)]'
             }`}>
               {/* Header */}
-              <div className="flex justify-between items-start mb-4 pb-3 border-b border-white/10">
+              <div className="flex justify-between items-start mb-4 pb-3 border-b border-[var(--border-color)]">
                 <div>
-                  <div className="text-[10px] text-gray-400 font-mono uppercase tracking-wider mb-1">
+                  <div className="text-[10px] text-[var(--text-secondary)] font-mono uppercase tracking-wider mb-1">
                     Order #{order._id.substring(order._id.length - 6)}
                   </div>
-                  <h3 className="font-bold text-white text-lg">{order.user?.name || "Customer"}</h3>
-                  <p className="text-xs text-gray-400 flex items-center space-x-1 mt-0.5">
+                  <h3 className="font-black text-[var(--text-primary)] text-lg tracking-tight">{order.user?.name || "Customer"}</h3>
+                  <p className="text-xs text-[var(--text-secondary)] flex items-center space-x-1 mt-0.5">
                     <span className="truncate max-w-[200px]">{order.deliveryAddress || order.user?.address || "No address provided"}</span>
                   </p>
                 </div>
-                <div className={`text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap ${
-                    order.status === 'Delivered' ? 'bg-green-500/20 text-green-400' : 
-                    order.status === 'Cancelled' ? 'bg-red-500/20 text-red-500' :
-                    order.status === 'Pending' ? 'bg-yellow-500/20 text-yellow-500' : 'bg-brand-primary/20 text-brand-primary'
+                <div className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl border ${
+                    order.status === 'Delivered' ? 'bg-[#3D9970]/10 text-[#3D9970] border-[#3D9970]/10' : 
+                    order.status === 'Cancelled' ? 'bg-red-500/10 text-red-500' :
+                    order.status === 'Pending' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-[var(--brand-orange)]/10 text-[var(--brand-orange)]'
                   }`}>
                     {order.status}
                 </div>
               </div>
 
               {/* Order Items */}
-              <div className="space-y-2 mb-5 bg-black/30 p-3 rounded-xl border border-white/5">
+              <div className="space-y-2 mb-5 bg-[var(--bg-primary)] p-4 rounded-xl border border-[var(--border-color)]">
                 {order.items.map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center text-sm">
                     <div className="flex items-center space-x-3">
-                       <span className="text-brand-primary font-bold bg-brand-primary/10 px-2 py-0.5 rounded">{item.quantity}x</span> 
-                       <span className="text-white font-medium">{item.food?.name || "Unknown Item"}</span>
+                       <span className="text-[var(--brand-orange)] font-black bg-[var(--brand-orange)]/10 px-2.5 py-1 rounded text-[10px] tracking-tight">{item.quantity}x</span> 
+                       <span className="text-[var(--text-primary)] font-black tracking-tight">{item.food?.name || "Unknown Item"}</span>
                     </div>
-                    <span className="text-gray-400 font-mono">₹{item.price * item.quantity}</span>
+                    <span className="text-[var(--text-secondary)] font-mono text-xs">₹{item.price * item.quantity}</span>
                   </div>
                 ))}
               </div>
@@ -107,14 +107,14 @@ export default function PartnerDashboard() {
               {/* Status Pipeline Buttons */}
               {order.status !== 'Cancelled' ? (
                 <div className="flex space-x-2">
-                  <StatusButton order={order} status="Pending" icon={Clock} label="Pending" colorClass="bg-yellow-500 text-white" />
-                  <StatusButton order={order} status="Preparing" icon={Package} label="Cooking" colorClass="bg-blue-500 text-white" />
-                  <StatusButton order={order} status="Out for Delivery" icon={Truck} label="Out" colorClass="bg-purple-500 text-white" />
-                  <StatusButton order={order} status="Delivered" icon={CheckCircle} label="Done" colorClass="bg-green-500 text-white" />
+                  <StatusButton order={order} status="Pending" icon={Clock} label="Pending" colorClass="bg-yellow-500" />
+                  <StatusButton order={order} status="Preparing" icon={Package} label="Cooking" colorClass="bg-blue-500" />
+                  <StatusButton order={order} status="Out for Delivery" icon={Truck} label="Out" colorClass="bg-purple-500" />
+                  <StatusButton order={order} status="Delivered" icon={CheckCircle} label="Done" colorClass="bg-[#3D9970]" />
                 </div>
               ) : (
-                <div className="text-center text-red-400 text-sm font-semibold bg-red-500/10 py-2 rounded-xl">
-                   Customer cancelled this order.
+                <div className="text-center text-red-500 text-xs font-black bg-red-500/10 py-3 rounded-xl uppercase tracking-widest">
+                   Order Cancelled
                 </div>
               )}
             </div>

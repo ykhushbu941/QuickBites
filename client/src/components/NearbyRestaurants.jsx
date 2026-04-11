@@ -35,52 +35,57 @@ export default function NearbyRestaurants({ foods, onRestaurantClick }) {
   if (restaurants.length === 0) return null;
 
   return (
-    <div className="mt-8 mb-4">
-      <div className="flex justify-between items-end mb-5">
-        <h2 className="font-black text-xl md:text-2xl text-[#1C1C1C] tracking-tight">Top brands for you</h2>
-        <button className="text-[#FC8019] text-sm font-black hover:underline px-2">View All</button>
+    <div className="mt-4 mb-4">
+      <div className="flex justify-between items-end mb-6 px-1">
+        <h2 className="font-black text-xl md:text-2xl text-[var(--text-primary)] tracking-tight flex items-center">
+           Top brands for you <div className="ml-4 h-1 w-1 rounded-full bg-[var(--brand-orange)]" />
+        </h2>
+        <button className="text-[var(--brand-orange)] text-[13px] font-black hover:underline px-2 uppercase tracking-widest">View All</button>
       </div>
 
-      <div className="flex overflow-x-auto space-x-6 no-scrollbar pb-6 -mx-4 px-4 snap-x snap-mandatory">
+      <div className="flex overflow-x-auto space-x-6 md:space-x-8 no-scrollbar pb-8 -mx-4 md:mx-0 px-4 md:px-0 snap-x snap-mandatory">
         {restaurants.map((rest, i) => (
           <div 
              key={i} 
              onClick={() => onRestaurantClick && onRestaurantClick(rest.name)}
-             className="min-w-[280px] max-w-[280px] md:min-w-[340px] md:max-w-[340px] snap-center bg-white rounded-[2rem] overflow-hidden shadow-xl shadow-black/5 border border-black/[0.03] flex flex-col shrink-0 cursor-pointer hover:scale-[1.02] transition-all duration-300"
+             className="min-w-[260px] max-w-[260px] md:min-w-[320px] md:max-w-[320px] snap-start bg-[var(--bg-surface)] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/[0.03] border border-[var(--border-color)] flex flex-col shrink-0 cursor-pointer hover:-translate-y-2 transition-all duration-500 ease-out group"
           >
             {/* Image Banner */}
-            <div className="h-40 md:h-44 w-full relative">
-               <img src={rest.image} alt={rest.name} className="w-full h-full object-cover" />
-               <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent" />
+            <div className="h-36 md:h-40 w-full relative overflow-hidden">
+               <img src={rest.image} alt={rest.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
+               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
                <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black text-[#1C1C1C] flex items-center shadow-lg border border-black/5 uppercase tracking-widest">
                   CURATED
+               </div>
+               
+               <div className="absolute bottom-4 left-4 flex items-center bg-[#3D9970] text-white px-2.5 py-1 rounded-lg text-xs font-black shadow-lg">
+                  {rest.rating} <Star className="w-3 h-3 ml-1 fill-white" />
                </div>
             </div>
 
             {/* Details */}
-            <div className="p-5 flex-grow bg-white">
-               <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-black text-[#1C1C1C] truncate max-w-[200px] text-lg md:text-xl tracking-tight">{rest.name}</h3>
-                  <div className="flex items-center bg-[#3D9970] text-white px-2 py-1 rounded-lg text-xs font-black shadow-lg shadow-green-900/10">
-                     {rest.rating} <Star className="w-3 h-3 ml-1 fill-white" />
-                  </div>
+            <div className="p-6 flex-grow bg-[var(--bg-surface)]">
+               <div className="mb-1">
+                  <h3 className="font-black text-[var(--text-primary)] truncate text-lg md:text-xl tracking-tight group-hover:text-[var(--brand-orange)] transition-colors">{rest.name}</h3>
                </div>
                
-               <p className="text-sm text-gray-400 font-bold truncate mb-5">
+               <p className="text-[13px] text-[var(--text-secondary)] font-bold truncate mb-6">
                    {rest.cuisines.length > 0 ? rest.cuisines.join(", ") : "Multi-cuisine"}
                </p>
 
-               <div className="flex items-center justify-between border-t border-black/[0.03] pt-4">
-                  <div className="flex items-center text-[#1C1C1C] text-xs font-black tracking-tight">
-                      <Clock className="w-4 h-4 mr-2 text-[#FC8019]" /> {rest.time}
+               <div className="flex items-center justify-between border-t border-[var(--border-color)] pt-5">
+                  <div className="flex items-center text-[var(--text-primary)] text-[13px] font-black tracking-tight">
+                      <Clock className="w-4 h-4 mr-2 text-[var(--brand-orange)]" /> {rest.time}
                   </div>
-                  <div className="text-[11px] font-black text-[#FC8019] px-2 py-1 bg-[#FC8019]/10 rounded-lg">
+                  <div className="text-[10px] font-black text-[var(--brand-orange)] px-2.5 py-1.5 bg-[var(--brand-orange)]/10 rounded-xl uppercase tracking-tighter">
                       Free Delivery
                   </div>
                </div>
             </div>
           </div>
         ))}
+        {/* Extra spacer for end padding */}
+        <div className="min-w-[40px] shrink-0 md:hidden" />
       </div>
     </div>
   );

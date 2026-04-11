@@ -13,6 +13,8 @@ import CartPage from "./pages/CartPage";
 import ProfilePage from "./pages/ProfilePage";
 import SavedPage from "./pages/SavedPage";
 
+import { ThemeProvider } from "./context/ThemeContext";
+
 // Components
 import TopBar from "./components/TopBar";
 import BottomNavigation from "./components/BottomNavigation";
@@ -23,7 +25,11 @@ import LandingPage from "./pages/LandingPage";
 function ProtectedRoute({ children }) {
   const { token, loading } = useContext(AuthContext);
 
-  if (loading) return <div className="h-screen flex text-white justify-center items-center bg-brand-dark">Loading...</div>;
+  if (loading) return (
+    <div className="h-screen flex justify-center items-center bg-[var(--bg-primary)] text-[var(--text-primary)]">
+      <div className="w-10 h-10 border-2 border-[var(--brand-orange)] border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
   if (!token) return <Navigate to="/login" />;
   
   return children;
@@ -33,7 +39,11 @@ function ProtectedRoute({ children }) {
 function PartnerRoute({ children }) {
   const { token, role, loading } = useContext(AuthContext);
 
-  if (loading) return <div className="h-screen flex text-white justify-center items-center bg-brand-dark">Loading...</div>;
+  if (loading) return (
+    <div className="h-screen flex justify-center items-center bg-[var(--bg-primary)] text-[var(--text-primary)]">
+      <div className="w-10 h-10 border-2 border-[var(--brand-orange)] border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
   if (!token) return <Navigate to="/login" />;
   if (role !== "partner") return <Navigate to="/home" />;
 
@@ -42,8 +52,9 @@ function PartnerRoute({ children }) {
 
 export default function App() {
   return (
-    <div className="bg-brand-dark min-h-screen font-sans antialiased text-white pb-16 pt-14 selection:bg-brand-primary/30 relative">
-      <TopBar />
+    <ThemeProvider>
+      <div className="bg-[var(--bg-primary)] min-h-screen font-sans antialiased text-[var(--text-primary)] pb-16 pt-14 relative transition-colors duration-300">
+        <TopBar />
 
       <Routes>
         {/* Splash / Landing */}
@@ -123,6 +134,7 @@ export default function App() {
       </Routes>
 
       <BottomNavigation />
-    </div>
+      </div>
+    </ThemeProvider>
   );
 }

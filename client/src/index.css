@@ -4,18 +4,39 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg-primary: #F8F9FA;
+  --bg-surface: #FFFFFF;
+  --text-primary: #1C1C1C;
+  --text-secondary: #6B7280;
+  --border-color: rgba(0, 0, 0, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --brand-orange: #FC8019;
+  --brand-yellow: #FFB01F;
+}
+
+.dark {
+  --bg-primary: #0A0A0A;
+  --bg-surface: #121212;
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(18, 18, 18, 0.95);
+}
+
 /* ── Base ── */
 *, *::before, *::after { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: #F8F9FA; /* Soft Swiggy-like light background */
-  color: #1C1C1C; /* Deep charcoal for premium readability */
+  background-color: var(--bg-primary); 
+  color: var(--text-primary); 
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ── Scrollbar hide ── */
@@ -23,18 +44,22 @@ body {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* ── Premium Light Glass ── */
+  /* ── Premium Glass ── */
   .glass-panel {
-    @apply bg-white/80 backdrop-blur-xl border border-black/5 shadow-sm;
+    background-color: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
   }
 
   /* ── Swiggy-style Premium Card ── */
   .card-surface {
-    background: #FFFFFF;
-    border: 1px solid rgba(0,0,0,0.04);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
     border-radius: 1.5rem;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.01);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
   }
   
   .card-surface:hover {
@@ -42,28 +67,27 @@ body {
     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);
   }
 
-  /* ── Safe-area bottom padding for phones ── */
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-
-  /* ── Gradient text ── */
-  .gradient-text {
-    background: linear-gradient(135deg, #FC8019 0%, #FFB01F 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* ── Premium Glow ── */
-  .glow-orange {
+  /* ── Primary Orange Button ── */
+  .btn-primary {
+    background-color: var(--brand-orange);
+    color: #FFFFFF;
+    font-weight: 800;
+    border-radius: 1rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease;
     box-shadow: 0 8px 16px rgba(252, 128, 25, 0.15);
   }
 
-  /* ── Primary Orange Button ── */
-  .btn-primary {
-    @apply bg-[#FC8019] text-white font-extra-bold rounded-2xl px-6 py-3 transition-all active:scale-95 hover:bg-[#E67216] shadow-md shadow-orange-500/20;
+  .btn-primary:active {
+    transform: scale(0.95);
   }
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--brand-orange) 0%, var(--brand-yellow) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* ── Veg / Non-Veg dot ── */
