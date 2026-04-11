@@ -82,173 +82,193 @@ export default function CartPage() {
   const restaurantImage = cart[0]?.food?.imageUrl;
 
   return (
-    <div className="max-w-md md:max-w-5xl mx-auto min-h-screen bg-[#121212] pb-[140px] md:pb-[100px]">
+    <div className="max-w-md md:max-w-5xl mx-auto min-h-screen bg-[#F8F9FA] pb-[140px] md:pb-[100px]">
       
       {/* Header */}
-      <div className="bg-[#1C1C1C] px-4 py-4 pt-16 flex items-center shadow-sm">
-          <button onClick={() => navigate(-1)} className="mr-4 p-2 -ml-2 rounded-full hover:bg-white/5">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      <div className="bg-white px-4 py-4 pt-16 flex items-center shadow-sm border-b border-black/5">
+          <button onClick={() => navigate(-1)} className="mr-4 p-2 -ml-2 rounded-full hover:bg-black/5 transition-colors">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1C1C1C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
           </button>
           <div>
-            <h1 className="font-bold text-lg text-white leading-tight">{restaurantName}</h1>
-            <p className="text-xs text-white/60">Order for yourself</p>
+            <h1 className="font-black text-xl text-[#1C1C1C] leading-tight tracking-tight">{restaurantName}</h1>
+            <p className="text-xs text-gray-500 font-bold">Checkout</p>
           </div>
       </div>
 
-      <div className="p-4 space-y-4 md:space-y-0 md:grid md:grid-cols-3 md:gap-6 md:items-start text-left">
+      <div className="p-4 space-y-4 md:space-y-0 md:grid md:grid-cols-3 md:gap-8 md:items-start text-left max-w-7xl mx-auto">
           
         {/* Left Column: Cart Items */}
-        <div className="md:col-span-2 space-y-4">
+        <div className="md:col-span-2 space-y-6">
           {/* Cart Items Card */}
-        <div className="bg-[#1C1C1C] rounded-2xl p-4 shadow-sm border border-white/5">
-          <div className="flex items-center gap-2 pb-4 mb-4 border-b border-white/10 border-dashed">
-             <Clock className="w-4 h-4 text-[#FC8019]" />
-             <span className="text-sm font-bold text-white">Delivery in 25-30 mins</span>
-          </div>
+          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-black/[0.02] border border-black/5">
+            <div className="flex items-center gap-3 pb-6 mb-6 border-b border-black/[0.05] border-dashed">
+               <div className="w-10 h-10 rounded-full bg-[#FC8019]/10 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-[#FC8019]" />
+               </div>
+               <div>
+                  <span className="text-sm font-black text-[#1C1C1C]">Delivery in 25-30 mins</span>
+                  <p className="text-[11px] text-gray-400 font-bold uppercase tracking-wider">Fastest in your area</p>
+               </div>
+            </div>
 
-          <div className="space-y-6">
-            {cart.map((item) => (
-              <div key={item.food._id} className="flex items-start gap-4">
-                
-                {/* Food info */}
-                <div className="flex-grow">
-                   <div className={`w-3 h-3 rounded-sm border flex items-center justify-center mb-1.5 ${item.food.isVeg ? "border-[#3D9970]" : "border-[#E23744]"}`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${item.food.isVeg ? "bg-[#3D9970]" : "bg-[#E23744]"}`} />
-                   </div>
-                   <h3 className="font-semibold text-sm text-white">{item.food.name}</h3>
-                   <div className="text-white font-medium text-sm mt-1">₹{item.price}</div>
-                   
-                   {/* Customizer Mock */}
-                   <div className="text-[10px] text-white/50 mt-1 cursor-pointer">Customize ›</div>
+            <div className="space-y-8">
+              {cart.map((item) => (
+                <div key={item.food._id} className="flex items-start gap-5">
+                  
+                  {/* Food info */}
+                  <div className="flex-grow">
+                     <div className={`w-4 h-4 rounded border-2 flex items-center justify-center mb-2 bg-white ${item.food.isVeg ? "border-[#3D9970]" : "border-[#E23744]"}`}>
+                          <div className={`w-2 h-2 rounded-full ${item.food.isVeg ? "bg-[#3D9970]" : "bg-[#E23744]"}`} />
+                     </div>
+                     <h3 className="font-black text-lg text-[#1C1C1C] leading-tight group-hover:text-[#FC8019] transition-colors">{item.food.name}</h3>
+                     <div className="text-[#1C1C1C] font-black text-lg mt-1 tracking-tight">₹{item.price}</div>
+                     
+                     <button className="text-[11px] text-[#FC8019]/70 font-black mt-3 flex items-center hover:text-[#FC8019] transition-colors">
+                        CUSTOMIZE <span className="ml-1 text-[8px]">▼</span>
+                     </button>
+                  </div>
+
+                  {/* Sub-controls */}
+                  <div className="relative shrink-0">
+                      <div className="w-28 h-28 rounded-2xl overflow-hidden bg-[#F8F9FA] shadow-inner border border-black/[0.02]">
+                          {item.food.imageUrl ? (
+                             <img src={item.food.imageUrl} alt={item.food.name} className="w-full h-full object-cover" />
+                          ) : (
+                             <div className="w-full h-full flex items-center justify-center text-3xl">🍽️</div>
+                          )}
+                      </div>
+                      {/* Quantity Stepper */}
+                      <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white border-2 border-[#1C1C1C] shadow-xl rounded-xl flex items-center justify-between w-24 h-10 px-2">
+                          <button 
+                              onClick={() => removeFromCart(item.food._id)}
+                              className="w-8 h-full flex items-center justify-center text-[#1C1C1C] hover:bg-black/5 rounded-lg transition-colors"
+                          >
+                              <Minus className="w-4 h-4" strokeWidth={3} />
+                          </button>
+                          <span className="text-sm font-black text-[#1C1C1C] w-6 text-center">{item.quantity}</span>
+                          <button 
+                              onClick={() => addToCart(item.food)}
+                              className="w-8 h-full flex items-center justify-center text-[#FC8019] hover:bg-[#FC8019]/10 rounded-lg transition-colors"
+                          >
+                              <Plus className="w-4 h-4" strokeWidth={3} />
+                          </button>
+                      </div>
+                  </div>
+
                 </div>
-
-                {/* Sub-controls */}
-                <div className="relative shrink-0">
-                    <div className="w-24 h-24 rounded-xl overflow-hidden bg-[#2A2A2A] shadow-sm">
-                        {item.food.imageUrl ? (
-                           <img src={item.food.imageUrl} alt={item.food.name} className="w-full h-full object-cover" />
-                        ) : (
-                           <div className="w-full h-full flex items-center justify-center text-3xl">🍽️</div>
-                        )}
-                    </div>
-                    {/* Quantity Stepper */}
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-[#1C1C1C] border border-[#FC8019]/50 shadow-md rounded-lg flex items-center justify-between w-20 h-8 px-1">
-                        <button 
-                            onClick={() => removeFromCart(item.food._id)}
-                            className="w-6 h-full flex items-center justify-center text-[#FC8019] text-xl font-medium active:bg-[#FC8019]/10 rounded"
-                        >
-                            <Minus className="w-3.5 h-3.5" />
-                        </button>
-                        <span className="text-xs font-bold text-white w-4 text-center">{item.quantity}</span>
-                        <button 
-                            onClick={() => addToCart(item.food)}
-                            className="w-6 h-full flex items-center justify-center text-[#FC8019] text-xl font-medium active:bg-[#FC8019]/10 rounded"
-                        >
-                            <Plus className="w-3.5 h-3.5" />
-                        </button>
-                    </div>
+              ))}
+            </div>
+            
+            <div className="mt-12 pt-6 border-t border-black/[0.03] flex items-center gap-4 cursor-pointer group">
+                <div className="w-10 h-10 rounded-full bg-black/[0.03] flex items-center justify-center group-hover:bg-[#FC8019]/10 transition-colors">
+                   <Tag className="w-5 h-5 text-gray-400 group-hover:text-[#FC8019]" />
                 </div>
-
-              </div>
-            ))}
+                <span className="text-sm font-black text-gray-400 group-hover:text-[#1C1C1C] transition-colors uppercase tracking-widest text-[10px]">Add cooking instructions</span>
+            </div>
           </div>
-          
-          <div className="mt-8 pt-4 pb-1 border-t border-white/5 cursor-pointer flex gap-3 text-white/80 hover:text-white">
-              <svg className="w-5 h-5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-              <span className="text-sm font-medium">Add cooking instructions</span>
-          </div>
-        </div>
         </div>
 
         {/* Right Column: Bill & Offers */}
-        <div className="md:col-span-1 space-y-4">
+        <div className="md:col-span-1 space-y-6">
           {/* Offers Card */}
-        <div className="bg-[#1C1C1C] rounded-2xl p-4 shadow-sm border border-white/5 flex flex-col justify-center">
-            <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowCouponInput(!showCouponInput)}>
-                <div className="flex items-center gap-3">
-                    <Tag className="w-5 h-5 text-blue-400" />
-                    <span className="text-sm font-bold text-white">Apply Coupon</span>
-                </div>
-                <span className="text-[#FC8019] text-sm font-bold uppercase">{showCouponInput ? "Close" : "Select"}</span>
-            </div>
-            
-            {showCouponInput && (
-               <div className="mt-4 flex items-center gap-2">
-                   <input 
-                      type="text" 
-                      placeholder="Enter SWIGGY50"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      className="flex-grow bg-[#2A2A2A] text-white border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#FC8019]/50"
-                   />
-                   <button 
-                      onClick={applyCoupon}
-                      className="bg-[#FC8019] text-white px-4 py-2 rounded-lg text-sm font-bold disabled:opacity-50"
-                      disabled={!couponCode.trim()}
-                   >
-                      APPLY
-                   </button>
-               </div>
-            )}
-        </div>
+          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-black/[0.02] border border-black/5 flex flex-col justify-center">
+              <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowCouponInput(!showCouponInput)}>
+                  <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                         <Tag className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <span className="text-base font-black text-[#1C1C1C] tracking-tight">Apply Coupon</span>
+                  </div>
+                  <span className="text-[#FC8019] text-sm font-black uppercase tracking-widest">{showCouponInput ? "CLOSE" : "SELECT"}</span>
+              </div>
+              
+              {showCouponInput && (
+                 <div className="mt-6 flex items-center gap-3 animate-slide-up">
+                     <input 
+                        type="text" 
+                        placeholder="e.g. SWIGGY50"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        className="flex-grow bg-[#F8F9FA] text-[#1C1C1C] border-2 border-black/[0.03] rounded-2xl px-4 py-3 text-sm font-black focus:outline-none focus:border-[#FC8019]/50 transition-all"
+                     />
+                     <button 
+                        onClick={applyCoupon}
+                        className="bg-[#FC8019] text-white px-6 py-3 rounded-2xl text-xs font-black tracking-widest disabled:opacity-50 shadow-lg shadow-orange-500/20 active:scale-95 transition-all"
+                        disabled={!couponCode.trim()}
+                     >
+                        APPLY
+                     </button>
+                 </div>
+              )}
+          </div>
 
-        {/* Bill Details */}
-        <div className="bg-[#1C1C1C] rounded-2xl p-4 shadow-sm border border-white/5">
-          <h3 className="font-bold mb-4 text-white">Bill Details</h3>
-          <div className="space-y-3 text-xs">
-            <div className="flex justify-between text-white/70">
-              <span>Item Total</span>
-              <span>₹{getCartTotal()}</span>
-            </div>
-            <div className="flex justify-between text-white/70">
-              <span>Delivery Fee | 3.5 kms</span>
-              <span>₹40</span>
-            </div>
-            <hr className="border-white/5 my-2" />
-            
-            {discount > 0 && (
-               <div className="flex justify-between text-green-400 font-bold">
-                  <span>Coupon Discount</span>
-                  <span>-₹{discount}</span>
-               </div>
-            )}
-            
-            <div className="flex justify-between text-white/70">
-              <span>Platform fee</span>
-              <span>₹5</span>
-            </div>
-            <div className="flex justify-between text-white/70">
-              <span>GST and Restaurant Charges</span>
-              <span>₹{Math.round(getCartTotal() * 0.05)}</span>
-            </div>
-            <hr className="border-white/10 my-3 border-dashed" />
-            <div className="flex justify-between font-bold text-sm text-white">
-              <span className="uppercase">To Pay</span>
-              <span>₹{calculateTotal() + 5}</span> {/* +5 for platform fee */}
+          {/* Bill Details */}
+          <div className="bg-white rounded-3xl p-6 shadow-xl shadow-black/[0.02] border border-black/5 group">
+            <h3 className="font-black text-lg text-[#1C1C1C] mb-6 tracking-tight flex items-center">
+               Bill Details <div className="ml-3 h-[2px] w-8 bg-[#FC8019] rounded-full" />
+            </h3>
+            <div className="space-y-4 text-sm font-bold text-gray-500">
+              <div className="flex justify-between items-center">
+                <span>Item Total</span>
+                <span className="text-[#1C1C1C]">₹{getCartTotal()}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="flex flex-col">
+                   <span>Delivery Fee</span>
+                   <span className="text-[10px] text-gray-300 uppercase font-black tracking-widest">3.5 kms away</span>
+                </div>
+                <span className="text-[#1C1C1C]">₹40</span>
+              </div>
+              <hr className="border-black/[0.03] my-4" />
+              
+              {discount > 0 && (
+                 <div className="flex justify-between items-center text-[#3D9970] font-black italic">
+                    <span>Coupon Discount</span>
+                    <span>-₹{discount}</span>
+                 </div>
+              )}
+              
+              <div className="flex justify-between items-center">
+                <span>Platform fee</span>
+                <span className="text-[#1C1C1C]">₹5</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>GST & Taxes</span>
+                <span className="text-[#1C1C1C]">₹{Math.round(getCartTotal() * 0.05)}</span>
+              </div>
+              <div className="pt-6 border-t border-black/5 mt-6">
+                 <div className="flex justify-between items-end">
+                    <div>
+                       <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-1">Grand Total</p>
+                       <span className="text-2xl font-black text-[#1C1C1C] tracking-tighter">₹{calculateTotal() + 5}</span>
+                    </div>
+                    <div className="text-[10px] font-black text-[#3D9970] bg-[#3D9970]/10 px-2 py-1 rounded-lg uppercase tracking-wider">Saved ₹{discount + 20}</div>
+                 </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Cancellation Policy */}
-        <div className="bg-[#1C1C1C] rounded-2xl p-4 shadow-sm border border-white/5">
-            <h3 className="font-bold text-sm text-white mb-2">Review your order and address details to avoid cancellations</h3>
-            <p className="text-xs text-white/50 leading-relaxed">
-               <span className="text-red-400 font-semibold">Note:</span> If you choose to cancel, you can do it within 60 seconds after placing order. A 100% cancellation fee will be applicable afterwards.
-            </p>
-        </div>
+          {/* Cancellation Policy */}
+          <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-black/[0.03]">
+              <h3 className="font-black text-xs text-gray-400 mb-2 uppercase tracking-widest">Cancellation Policy</h3>
+              <p className="text-xs text-gray-400 font-bold leading-relaxed">
+                 Orders cannot be cancelled once packed. A 100% cancellation fee will apply to compensate our restaurant partners.
+              </p>
+          </div>
         </div>
       </div>
 
-      {/* Floating Checkout Bar overlaying the bottom nav safe area */}
-      <div className="fixed bottom-[4rem] left-0 right-0 z-[60] bg-[#1C1C1C] border-t border-white/10 p-3 shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
-        <div className="max-w-md md:max-w-5xl mx-auto flex items-center gap-3">
+      {/* Floating Checkout Bar */}
+      <div className="fixed bottom-[4rem] left-0 right-0 z-[60] bg-white border-t border-black/5 p-4 shadow-[0_-20px_40px_rgba(0,0,0,0.05)]">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
             {/* Delivery address left */}
-            <div className="w-1/2 p-2 bg-[#2A2A2A] rounded-xl flex items-start gap-2">
-                <MapPin className="w-5 h-5 text-[#FC8019] shrink-0 mt-0.5" />
+            <div className="flex-grow max-w-[50%] p-3 bg-[#F8F9FA] rounded-[2rem] flex items-center gap-4 transition-all hover:bg-white hover:shadow-lg border border-transparent hover:border-black/5 cursor-pointer">
+                <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0">
+                   <MapPin className="w-5 h-5 text-[#FC8019]" />
+                </div>
                 <div className="overflow-hidden">
-                   <div className="text-[11px] font-bold text-white/50 uppercase tracking-widest mb-0.5">Delivering To</div>
-                   <div className="text-sm font-bold text-white truncate">Home</div>
-                   <div className="text-xs text-white/60 truncate">{user?.address || "Please select address"}</div>
+                   <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Delivering to</div>
+                   <div className="text-sm font-black text-[#1C1C1C] truncate leading-tight">Home ⋅ {user?.address || "Address"}</div>
                 </div>
             </div>
 
@@ -256,16 +276,22 @@ export default function CartPage() {
             <button 
               onClick={handleCheckout}
               disabled={loading}
-              className="w-1/2 h-full bg-[#1DE9B6] text-[#0A4A38] rounded-xl font-bold flex flex-col justify-center px-4 active:scale-95 transition-all outline-none"
+              className="flex-grow max-w-[50%] h-16 bg-[#1C1C1C] text-white rounded-[2rem] font-black flex items-center justify-between px-8 shadow-2xl active:scale-95 transition-all group overflow-hidden relative"
             >
-               <div className="text-xs uppercase tracking-wide font-extrabold opacity-80 mb-0.5">Pay Using</div>
-               <div className="flex items-center justify-between">
-                   <span className="text-sm sm:text-base font-bold">Cash on Delivery</span>
-                   <span className="text-base sm:text-lg font-extrabold ml-1">›</span>
+               <div className="relative z-10">
+                   <div className="text-[10px] uppercase tracking-widest font-black opacity-50 mb-0.5 text-left">Confirm Order</div>
+                   <div className="text-lg font-black tracking-tight">CASH ON DELIVERY</div>
+               </div>
+               <div className="relative z-10 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:translate-x-1 transition-transform">
+                   <ArrowRight className="w-6 h-6 text-white" />
                </div>
             </button>
         </div>
       </div>
+      
+      {/* Spacer */}
+      <div className="h-8"></div>
+    </div>
       
       {/* Spacer to fix any underlap behind nav since nav is z-50 and cart is z-60 */}
       <div className="h-4"></div>

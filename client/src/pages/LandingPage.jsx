@@ -5,45 +5,50 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-[100dvh] w-full bg-gradient-to-br from-[#1C1C1C] to-[#0A0A0A] flex flex-col justify-between p-6 relative z-10 pt-20">
-      
-      {/* Hero Content - the old header was removed to avoid double branding */}
+    <div className="min-h-[100dvh] w-full bg-[#F8F9FA] flex flex-col justify-between p-6 relative z-10 pt-20 overflow-hidden">
+      {/* Background Orbs */}
+      <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-orange-500/10 blur-[120px] rounded-full z-0" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-400/10 blur-[120px] rounded-full z-0" />
 
       {/* Hero Content */}
-      <div className="flex-1 flex flex-col md:flex-row justify-center items-center text-center md:text-left max-w-sm md:max-w-5xl mx-auto md:w-full md:gap-16 lg:gap-32">
+      <div className="flex-1 flex flex-col md:flex-row justify-center items-center text-center md:text-left max-w-sm md:max-w-6xl mx-auto md:w-full md:gap-16 lg:gap-32 relative z-10">
         
-        {/* Main Graphic/Icon (Moved to top on mobile, right on desktop) */}
-        <div className="w-32 h-32 md:w-64 md:h-64 bg-gradient-to-tr from-[#FC8019] to-[#E23744] rounded-[2rem] md:rounded-[4rem] flex items-center justify-center shadow-lg shadow-[#FC8019]/20 mb-8 md:mb-0 md:order-2" style={{ transform: 'rotate(-10deg)' }}>
-            <span className="text-6xl md:text-9xl">🍕</span>
+        {/* Main Graphic/Icon */}
+        <div className="relative group mb-12 md:mb-0 md:order-2">
+            <div className="w-48 h-48 md:w-80 md:h-80 bg-gradient-to-tr from-[#FC8019] to-[#FFB01F] rounded-[3rem] md:rounded-[5rem] flex items-center justify-center shadow-2xl shadow-orange-500/30 rotate-[-8deg] group-hover:rotate-0 transition-all duration-700">
+                <span className="text-7xl md:text-9xl filter drop-shadow-xl animate-bounce">🍕</span>
+            </div>
+            {/* Absolute badges floating */}
+            <div className="absolute -top-4 -right-4 bg-white px-4 py-2 rounded-2xl shadow-xl font-black text-[#1C1C1C] text-sm animate-pulse">Hot & Fresh</div>
+            <div className="absolute -bottom-4 -left-4 bg-white px-4 py-2 rounded-2xl shadow-xl font-black text-[#FC8019] text-sm">4.8 ★ Ratings</div>
         </div>
         
-        <div className="md:order-1 flex flex-col items-center md:items-start md:max-w-md">
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white leading-tight tracking-tight mb-4">
-              Experience food like never before.
+        <div className="md:order-1 flex flex-col items-center md:items-start md:max-w-lg">
+            <h1 className="text-5xl sm:text-6xl md:text-8xl font-black text-[#1C1C1C] leading-[0.9] tracking-tighter mb-6">
+              Taste the <span className="text-[#FC8019]">Future</span> of Food.
             </h1>
-            <p className="text-gray-400 font-medium mb-10 md:text-lg">
-              Watch mouth-watering reels, explore nearby top brands, and order in seconds.
+            <p className="text-gray-500 font-bold mb-12 md:text-xl leading-relaxed">
+              Watch delicious reels, explore curated top brands, and get lightning-fast delivery.
             </p>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row w-full gap-4 mt-2">
+            <div className="flex flex-col sm:flex-row w-full gap-5 mt-2">
               <button 
                 onClick={() => navigate('/login')}
-                className="group bg-[#FC8019] text-white w-full py-4 px-8 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-3 shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+                className="group bg-[#1C1C1C] text-white w-full py-5 px-10 rounded-[2rem] font-black text-lg flex items-center justify-center gap-3 shadow-2xl shadow-black/20 hover:scale-[1.03] active:scale-95 transition-all"
               >
-                Log In
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                Get Started
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform" />
               </button>
               
               <button 
                 onClick={() => navigate('/register')}
-                className="bg-white/10 text-white w-full py-4 px-8 rounded-2xl font-extrabold text-lg hover:bg-white/20 transition-all shadow-lg hover:scale-[1.02] active:scale-95"
+                className="bg-white text-[#1C1C1C] border-2 border-black/[0.03] w-full py-5 px-10 rounded-[2rem] font-black text-lg hover:border-[#FC8019]/50 transition-all shadow-xl shadow-black/[0.02] hover:scale-[1.03] active:scale-95"
               >
-                Create Account
+                Join Now
               </button>
             </div>
         </div>
-
       </div>
     </div>
   );

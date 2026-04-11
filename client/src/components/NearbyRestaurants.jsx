@@ -35,42 +35,48 @@ export default function NearbyRestaurants({ foods, onRestaurantClick }) {
   if (restaurants.length === 0) return null;
 
   return (
-    <div className="mt-6 mb-2">
-      <div className="flex justify-between items-end mb-3">
-        <h2 className="font-bold text-lg md:text-xl text-white">Top Brands Near You</h2>
+    <div className="mt-8 mb-4">
+      <div className="flex justify-between items-end mb-5">
+        <h2 className="font-black text-xl md:text-2xl text-[#1C1C1C] tracking-tight">Top brands for you</h2>
+        <button className="text-[#FC8019] text-sm font-black hover:underline px-2">View All</button>
       </div>
 
-      <div className="flex overflow-x-auto space-x-5 no-scrollbar pb-4 -mx-4 px-4 snap-x snap-mandatory">
+      <div className="flex overflow-x-auto space-x-6 no-scrollbar pb-6 -mx-4 px-4 snap-x snap-mandatory">
         {restaurants.map((rest, i) => (
           <div 
              key={i} 
              onClick={() => onRestaurantClick && onRestaurantClick(rest.name)}
-             className="min-w-[280px] max-w-[280px] md:min-w-[320px] md:max-w-[320px] snap-center bg-brand-gray rounded-[1.25rem] overflow-hidden shadow-lg border border-white/5 flex flex-col shrink-0 cursor-pointer hover:border-brand-primary/50 transition-colors"
+             className="min-w-[280px] max-w-[280px] md:min-w-[340px] md:max-w-[340px] snap-center bg-white rounded-[2rem] overflow-hidden shadow-xl shadow-black/5 border border-black/[0.03] flex flex-col shrink-0 cursor-pointer hover:scale-[1.02] transition-all duration-300"
           >
             {/* Image Banner */}
-            <div className="h-36 md:h-40 w-full relative">
+            <div className="h-40 md:h-44 w-full relative">
                <img src={rest.image} alt={rest.name} className="w-full h-full object-cover" />
-               <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent" />
-               <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md text-[11px] font-extrabold text-white flex items-center shadow-sm border border-white/10 uppercase tracking-widest">
-                  PROMOTED
+               <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent" />
+               <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black text-[#1C1C1C] flex items-center shadow-lg border border-black/5 uppercase tracking-widest">
+                  CURATED
                </div>
             </div>
 
             {/* Details */}
-            <div className="p-4 bg-[#2A2A2A] flex-grow">
-               <div className="flex justify-between items-start mb-1.5">
-                  <h3 className="font-bold text-white truncate max-w-[180px] text-base md:text-lg">{rest.name}</h3>
-                  <div className="flex items-center bg-green-700 text-white px-2 py-0.5 rounded text-xs font-bold shadow-sm">
+            <div className="p-5 flex-grow bg-white">
+               <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-black text-[#1C1C1C] truncate max-w-[200px] text-lg md:text-xl tracking-tight">{rest.name}</h3>
+                  <div className="flex items-center bg-[#3D9970] text-white px-2 py-1 rounded-lg text-xs font-black shadow-lg shadow-green-900/10">
                      {rest.rating} <Star className="w-3 h-3 ml-1 fill-white" />
                   </div>
                </div>
                
-               <p className="text-sm text-gray-400 truncate mb-3"> {/* cuisines */}
+               <p className="text-sm text-gray-400 font-bold truncate mb-5">
                    {rest.cuisines.length > 0 ? rest.cuisines.join(", ") : "Multi-cuisine"}
                </p>
 
-               <div className="flex items-center text-[#FC8019] text-sm font-bold bg-[#FC8019]/10 w-fit px-3 py-1.5 rounded-lg border border-[#FC8019]/20">
-                   <Clock className="w-4 h-4 mr-1.5" /> {rest.time}
+               <div className="flex items-center justify-between border-t border-black/[0.03] pt-4">
+                  <div className="flex items-center text-[#1C1C1C] text-xs font-black tracking-tight">
+                      <Clock className="w-4 h-4 mr-2 text-[#FC8019]" /> {rest.time}
+                  </div>
+                  <div className="text-[11px] font-black text-[#FC8019] px-2 py-1 bg-[#FC8019]/10 rounded-lg">
+                      Free Delivery
+                  </div>
                </div>
             </div>
           </div>

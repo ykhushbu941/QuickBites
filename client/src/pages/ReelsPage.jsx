@@ -402,20 +402,29 @@ export default function ReelsPage() {
     <div className="bg-black w-full fixed inset-0 z-10 overflow-hidden sm:bg-[#121212]">
       
       {/* Top Filter Overlay (Instagram For You / Following Style) */}
-      <div className="absolute top-12 md:top-20 left-0 right-0 z-50 flex justify-center space-x-6 items-center">
-          <button onClick={() => setFilter("all")} className={`text-[15px] font-bold drop-shadow-md transition-all ${filter === "all" ? "text-white" : "text-white/50"}`}>For You</button>
-          
-          <div className="w-1 h-1 rounded-full bg-white/30 drop-shadow-md"></div>
-          
-          <button onClick={() => setFilter("veg")} className={`text-[15px] font-bold flex items-center drop-shadow-md transition-all ${filter === "veg" ? "text-[#3D9970]" : "text-white/50"}`}>
-             Veg
-          </button>
-          
-          <div className="w-1 h-1 rounded-full bg-white/30 drop-shadow-md"></div>
-          
-          <button onClick={() => setFilter("nonveg")} className={`text-[15px] font-bold flex items-center drop-shadow-md transition-all ${filter === "nonveg" ? "text-[#E23744]" : "text-white/50"}`}>
-             Non-Veg
-          </button>
+      <div className="absolute top-12 md:top-20 left-0 right-0 z-50 flex justify-center items-center">
+          <div className="flex items-center space-x-2 bg-white/5 backdrop-blur-xl px-2 py-1.5 rounded-[2rem] border border-white/10 shadow-2xl">
+              <button 
+                onClick={() => setFilter("all")} 
+                className={`text-[13px] font-black uppercase tracking-widest px-6 py-2 rounded-full transition-all duration-300 ${filter === "all" ? "bg-white text-black shadow-xl" : "text-white/40 hover:text-white/90"}`}
+              >
+                For You
+              </button>
+              
+              <button 
+                onClick={() => setFilter("veg")} 
+                className={`text-[13px] font-black uppercase tracking-widest px-6 py-2 rounded-full flex items-center transition-all duration-300 ${filter === "veg" ? "bg-[#3D9970] text-white shadow-xl shadow-[#3D9970]/20" : "text-white/40 hover:text-white/90"}`}
+              >
+                Veg
+              </button>
+              
+              <button 
+                onClick={() => setFilter("nonveg")} 
+                className={`text-[13px] font-black uppercase tracking-widest px-6 py-2 rounded-full flex items-center transition-all duration-300 ${filter === "nonveg" ? "bg-[#E23744] text-white shadow-xl shadow-[#E23744]/20" : "text-white/40 hover:text-white/90"}`}
+              >
+                Non-Veg
+              </button>
+          </div>
       </div>
 
       <div 
