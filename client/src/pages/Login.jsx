@@ -21,14 +21,8 @@ export default function Login() {
     try {
       const res = await axios.post("/api/auth/user/login", { email, password });
 
-      // Enforce correct portal
-      if (res.data.role !== loginType) {
-        setError(
-          `This email belongs to a ${res.data.role} account. Please switch to the correct login portal.`
-        );
-        setLoading(false);
-        return;
-      }
+      // Automatically switch UI loginType to match their actual role for seamless experience
+      setLoginType(res.data.role);
 
       login(res.data.token, res.data.role, res.data.user);
 

@@ -8,25 +8,10 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#1C1C1C] to-[#0A0A0A] flex flex-col justify-between p-6 fixed inset-0 z-50">
       
       {/* Top Header */}
-      <div className="flex justify-between items-center mt-4">
+      <div className="flex justify-center items-center mt-4">
         <div className="flex items-center gap-2 text-[#FC8019]">
           <Utensils className="w-8 h-8" />
           <span className="font-extrabold text-2xl tracking-tight text-white">BiteReel</span>
-        </div>
-        
-        <div className="flex gap-4">
-          <button 
-            onClick={() => navigate('/login')} 
-            className="text-white/80 font-bold text-sm tracking-wide hover:text-white transition-colors"
-          >
-            Log In
-          </button>
-          <button 
-            onClick={() => navigate('/register')} 
-            className="bg-white/10 text-white px-4 py-2 rounded-full font-bold text-sm tracking-wide hover:bg-white/20 transition-colors"
-          >
-            Register
-          </button>
         </div>
       </div>
 
@@ -45,14 +30,23 @@ export default function LandingPage() {
           Watch mouth-watering reels, explore nearby top brands, and order in seconds.
         </p>
 
-        {/* Enter App Button */}
-        <button 
-          onClick={() => navigate('/home')}
-          className="group bg-[#FC8019] text-white w-full py-4 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-3 shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
-        >
-          Explore ReelBite
-          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </button>
+        {/* Action Buttons */}
+        <div className="flex flex-col w-full gap-4 mt-2">
+          <button 
+            onClick={() => navigate('/login')}
+            className="group bg-[#FC8019] text-white w-full py-4 rounded-2xl font-extrabold text-lg flex items-center justify-center gap-3 shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+          >
+            Log In
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </button>
+          
+          <button 
+            onClick={() => navigate('/register')}
+            className="bg-white/10 text-white w-full py-4 rounded-2xl font-extrabold text-lg hover:bg-white/20 transition-all shadow-lg hover:scale-[1.02] active:scale-95"
+          >
+            Create an Account
+          </button>
+        </div>
 
       </div>
     </div>

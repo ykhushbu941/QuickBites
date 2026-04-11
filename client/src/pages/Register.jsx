@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 import { Eye, EyeOff, User, Mail, Lock, Phone, MapPin } from "lucide-react";
 
 export default function Register() {
@@ -10,13 +11,24 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const { login } = useContext(AuthContext); // Will need to import useContext and AuthContext
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
       await axios.post("/api/auth/user/register", user);
-      navigate("/login");
+      
+      // Auto-login after successful registration
+      const res = await axios.post("/api/auth/user/login", { email: user.email, password: user.password });
+      login(res.data.token, res.data.role, res.data.user);
+
+      if (res.data.role === "partner") {
+        navigate("/dashboard");
+      } else {
+        navigate("/home");
+      }
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.msg || err.message || "Failed to register. Is the server running?");
