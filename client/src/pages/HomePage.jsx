@@ -1,9 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Search, MapPin, Grid, Flame, Soup, Pizza, Search as SearchIcon, Star } from "lucide-react";
+import { Search, MapPin, Grid, Flame, Soup, Pizza, Search as SearchIcon, Star, CheckCircle } from "lucide-react";
 import NearbyRestaurants from "../components/NearbyRestaurants";
 import FoodDetailModal from "../components/FoodDetailModal";
+import { CartContext } from "../context/CartContext";
 
 const CATEGORIES = ["All", "Pizza", "Burger", "Dessert", "Drinks", "Other"];
 const CUISINES = ["All", "Indian", "South", "Chinese", "Italian", "Mexican", "American", "Japanese"];
@@ -23,6 +24,10 @@ export default function HomePage() {
   const [cuisine, setCuisine] = useState("All");
   const [vegFilter, setVegFilter] = useState("all"); 
   const [search, setSearch] = useState(searchParam);
+  
+  // Contexts
+  const { addToCart } = useContext(CartContext);
+  const [toast, setToast] = useState(null);
   
   // Modal State
   const [selectedFood, setSelectedFood] = useState(null);
@@ -69,10 +74,16 @@ export default function HomePage() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen px-4 py-4 pt-16 bg-brand-dark">
+    <div className="max-w-md md:max-w-7xl mx-auto min-h-screen px-4 md:px-8 py-4 pt-16 bg-brand-dark">
+      {toast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-black/90 backdrop-blur-md text-white px-5 py-3 rounded-full flex items-center space-x-2 border border-brand-primary/50 animate-fade-in shadow-2xl">
+          <CheckCircle className="w-5 h-5 text-brand-primary" />
+          <span className="text-sm font-bold whitespace-nowrap">{toast}</span>
+        </div>
+      )}
 
       {/* Header Search Area (Swiggy style banner) */}
-      <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] border-b border-white/5 -mx-4 -mt-4 px-4 pt-6 pb-12 rounded-b-[2rem] shadow-xl relative z-10">
+      <div className="bg-gradient-to-b from-[#1C1C1C] to-[#121212] border border-white/5 -mx-4 md:mx-auto -mt-4 md:mt-2 px-4 md:px-12 pt-6 pb-12 rounded-b-[2rem] md:rounded-[2rem] shadow-xl relative z-10 md:max-w-4xl">
           <form onSubmit={handleSearch} className="relative z-20">
             <input
               type="text"
@@ -95,12 +106,12 @@ export default function HomePage() {
       </div>
 
       {/* Nearby Restaurants Section */}
-      <div className="-mt-6 relative z-10">
+      <div className="-mt-6 relative z-10 md:max-w-4xl md:mx-auto">
          <NearbyRestaurants foods={foods} onRestaurantClick={(name) => { setSearch(name); fetchFoods(name); }} />
       </div>
 
       {/* Filters Section */}
-      <div className="mt-8 space-y-5">
+      <div className="mt-8 space-y-5 md:mt-12">
         
         {/* Quick Filters */}
         <div className="flex space-x-3 overflow-x-auto no-scrollbar py-1">
@@ -128,22 +139,22 @@ export default function HomePage() {
 
         {/* Cuisine Bubbles */}
         <div>
-          <h3 className="text-sm font-bold text-white mb-3">What's on your mind?</h3>
-          <div className="flex overflow-x-auto space-x-4 no-scrollbar pb-2">
+          <h3 className="text-base font-bold text-white mb-4">What's on your mind?</h3>
+          <div className="flex overflow-x-auto space-x-5 md:space-x-8 no-scrollbar pb-2">
             {CUISINES.map(c => (
               <button
                 key={c}
                 onClick={() => setCuisine(c)}
-                className="flex flex-col items-center shrink-0 w-[72px] space-y-2 group"
+                className="flex flex-col items-center shrink-0 w-[84px] md:w-[96px] space-y-2.5 group"
               >
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-lg transition-transform group-active:scale-95 ${
+                <div className={`w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center text-4xl md:text-5xl shadow-lg transition-transform group-active:scale-95 ${
                   cuisine === c
                     ? "bg-[#FC8019] border-2 border-white scale-105 shadow-[#FC8019]/40"
-                    : "bg-[#2A2A2A] border border-white/5"
+                    : "bg-[#2A2A2A] border border-white/5 hover:bg-[#333]"
                 }`}>
                   {CUISINE_ICONS[c]}
                 </div>
-                <span className={`text-[11px] font-semibold tracking-tight ${cuisine === c ? "text-[#FC8019]" : "text-gray-400"}`}>
+                <span className={`text-xs md:text-sm font-bold tracking-tight ${cuisine === c ? "text-[#FC8019]" : "text-gray-300"}`}>
                   {c}
                 </span>
               </button>
@@ -154,14 +165,14 @@ export default function HomePage() {
 
       {/* Food Grid */}
       <div className="mt-8 pb-32">
-        <h2 className="text-[17px] font-bold text-white mb-4">
+        <h2 className="text-[17px] md:text-xl font-bold text-white mb-4 md:mb-6">
            {loading ? "Discovering..." : `${foods.length} items to explore`}
         </h2>
 
         {loading ? (
-          <div className="grid grid-cols-2 gap-4 animate-pulse">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-[#2A2A2A] h-64 rounded-2xl" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 animate-pulse">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="bg-[#2A2A2A] h-64 md:h-64 rounded-2xl" />
             ))}
           </div>
         ) : foods.length === 0 ? (
@@ -172,15 +183,15 @@ export default function HomePage() {
             <button onClick={() => {setSearch(""); setCategory("All"); setCuisine("All"); setVegFilter("all");}} className="mt-4 px-6 py-2 bg-white/10 rounded-full text-sm font-semibold text-brand-primary">Reset Filters</button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 md:gap-6">
             {foods.map(food => (
               <div
                 key={food._id}
-                className="card-surface overflow-hidden flex flex-col group cursor-pointer hover:border-brand-primary/40 transition-all"
+                className="card-surface overflow-hidden flex flex-col group cursor-pointer hover:border-brand-primary/40 transition-all rounded-2xl"
                 onClick={() => setSelectedFood(food)}
               >
                 {/* Image */}
-                <div className="h-36 bg-[#1C1C1C] relative overflow-hidden">
+                <div className="h-56 sm:h-36 md:h-44 bg-[#1C1C1C] relative overflow-hidden">
                   {food.imageUrl ? (
                     <img
                       src={food.imageUrl}
@@ -192,31 +203,39 @@ export default function HomePage() {
                   )}
 
                   {/* Veg/Non-veg Dot */}
-                  <div className={`absolute top-2 right-2 w-4 h-4 rounded-sm border flex items-center justify-center shadow-lg bg-black/50 backdrop-blur-md ${food.isVeg ? "border-[#3D9970]" : "border-[#E23744]"}`}>
-                    <div className={`w-2 h-2 rounded-full z-10 ${food.isVeg ? "bg-[#3D9970]" : "bg-[#E23744]"}`} />
+                  <div className={`absolute top-3 right-3 w-5 h-5 rounded-sm border flex items-center justify-center shadow-lg bg-black/50 backdrop-blur-md ${food.isVeg ? "border-[#3D9970]" : "border-[#E23744]"}`}>
+                    <div className={`w-2.5 h-2.5 rounded-full z-10 ${food.isVeg ? "bg-[#3D9970]" : "bg-[#E23744]"}`} />
                   </div>
                   
                   {/* Rating Bubble mock */}
-                  <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm px-1.5 py-0.5 rounded text-[10px] font-bold text-white flex items-center">
-                     4.5 <Star className="w-2.5 h-2.5 ml-0.5 fill-yellow-400 text-yellow-400" />
+                  <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold text-white flex items-center">
+                     4.5 <Star className="w-3 h-3 ml-1 fill-yellow-400 text-yellow-400" />
                   </div>
                 </div>
 
-                <div className="p-3 flex flex-col flex-grow justify-between relative bg-gradient-to-b from-[#2C2C2C] to-[#252525]">
+                <div className="p-4 flex flex-col flex-grow justify-between relative bg-gradient-to-b from-[#2C2C2C] to-[#252525]">
                   <div>
-                    <h3 className="font-bold text-sm text-white mb-0.5 line-clamp-1">{food.name}</h3>
-                    <p className="text-gray-400 text-[11px] truncate mb-3">{food.restaurant}</p>
+                    <h3 className="font-bold text-base md:text-lg text-white mb-1 line-clamp-1">{food.name}</h3>
+                    <p className="text-gray-300 text-xs md:text-sm truncate mb-4">{food.restaurant}</p>
                   </div>
 
                   <div className="mt-auto">
-                    <div className="text-white font-bold text-sm">₹{food.price}</div>
+                    <div className="text-white font-bold text-base md:text-xl">₹{food.price}</div>
                   </div>
                   
                   {/* Floating Add Button overlapping image and content */}
-                  <div className="absolute bottom-3 right-3">
-                     <div className="bg-brand-primary/10 border border-brand-primary text-brand-primary px-4 py-1.5 rounded-lg text-xs font-bold uppercase shadow-sm">
+                  <div className="absolute bottom-4 right-4 z-20">
+                     <button 
+                         onClick={(e) => {
+                             e.stopPropagation();
+                             addToCart(food);
+                             setToast(`${food.name} added to cart!`);
+                             setTimeout(() => setToast(null), 2000);
+                         }}
+                         className="bg-brand-primary/10 border border-brand-primary text-brand-primary md:hover:bg-brand-primary md:hover:text-white transition-colors px-6 py-2 rounded-xl text-sm font-extrabold uppercase shadow-sm active:scale-95"
+                     >
                          ADD
-                     </div>
+                     </button>
                   </div>
                 </div>
               </div>

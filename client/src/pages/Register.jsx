@@ -52,7 +52,7 @@ export default function Register() {
       <div className="w-full max-w-sm relative z-10">
         <div className="text-center mb-6">
            <h1 className="text-3xl font-extrabold text-white tracking-tight">Create Account</h1>
-           <p className="text-gray-400 text-sm mt-1">Join ReelBite today!</p>
+           <p className="text-gray-400 text-sm mt-1">Join QuickBites today!</p>
         </div>
 
         <div className="bg-brand-gray rounded-3xl p-6 border border-white/8 shadow-2xl">

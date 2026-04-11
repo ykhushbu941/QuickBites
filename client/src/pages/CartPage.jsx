@@ -61,7 +61,7 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="max-w-md mx-auto min-h-screen px-4 py-8 flex flex-col items-center justify-center -mt-14 bg-[#1C1C1C]">
+      <div className="max-w-md md:max-w-5xl mx-auto min-h-screen px-4 py-8 flex flex-col items-center justify-center -mt-14 bg-[#1C1C1C]">
         <div className="w-48 h-48 mb-6 opacity-80">
            <img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/2xempty_cart_yfxml0" alt="Empty Cart" className="w-full h-full object-contain filter grayscale invert opacity-50" />
         </div>
@@ -82,7 +82,7 @@ export default function CartPage() {
   const restaurantImage = cart[0]?.food?.imageUrl;
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-[#121212] pb-[140px]">
+    <div className="max-w-md md:max-w-5xl mx-auto min-h-screen bg-[#121212] pb-[140px] md:pb-[100px]">
       
       {/* Header */}
       <div className="bg-[#1C1C1C] px-4 py-4 pt-16 flex items-center shadow-sm">
@@ -95,9 +95,11 @@ export default function CartPage() {
           </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 md:space-y-0 md:grid md:grid-cols-3 md:gap-6 md:items-start text-left">
           
-        {/* Cart Items Card */}
+        {/* Left Column: Cart Items */}
+        <div className="md:col-span-2 space-y-4">
+          {/* Cart Items Card */}
         <div className="bg-[#1C1C1C] rounded-2xl p-4 shadow-sm border border-white/5">
           <div className="flex items-center gap-2 pb-4 mb-4 border-b border-white/10 border-dashed">
              <Clock className="w-4 h-4 text-[#FC8019]" />
@@ -156,8 +158,11 @@ export default function CartPage() {
               <span className="text-sm font-medium">Add cooking instructions</span>
           </div>
         </div>
+        </div>
 
-        {/* Offers Card */}
+        {/* Right Column: Bill & Offers */}
+        <div className="md:col-span-1 space-y-4">
+          {/* Offers Card */}
         <div className="bg-[#1C1C1C] rounded-2xl p-4 shadow-sm border border-white/5 flex flex-col justify-center">
             <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowCouponInput(!showCouponInput)}>
                 <div className="flex items-center gap-3">
@@ -231,18 +236,19 @@ export default function CartPage() {
                <span className="text-red-400 font-semibold">Note:</span> If you choose to cancel, you can do it within 60 seconds after placing order. A 100% cancellation fee will be applicable afterwards.
             </p>
         </div>
+        </div>
       </div>
 
       {/* Floating Checkout Bar overlaying the bottom nav safe area */}
       <div className="fixed bottom-[4rem] left-0 right-0 z-[60] bg-[#1C1C1C] border-t border-white/10 p-3 shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
-        <div className="max-w-md mx-auto flex items-center gap-3">
+        <div className="max-w-md md:max-w-5xl mx-auto flex items-center gap-3">
             {/* Delivery address left */}
             <div className="w-1/2 p-2 bg-[#2A2A2A] rounded-xl flex items-start gap-2">
                 <MapPin className="w-5 h-5 text-[#FC8019] shrink-0 mt-0.5" />
                 <div className="overflow-hidden">
-                   <div className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-0.5">Delivering To</div>
-                   <div className="text-xs font-bold text-white truncate">Home</div>
-                   <div className="text-[10px] text-white/60 truncate">{user?.address || "Please select address"}</div>
+                   <div className="text-[11px] font-bold text-white/50 uppercase tracking-widest mb-0.5">Delivering To</div>
+                   <div className="text-sm font-bold text-white truncate">Home</div>
+                   <div className="text-xs text-white/60 truncate">{user?.address || "Please select address"}</div>
                 </div>
             </div>
 
@@ -252,10 +258,10 @@ export default function CartPage() {
               disabled={loading}
               className="w-1/2 h-full bg-[#1DE9B6] text-[#0A4A38] rounded-xl font-bold flex flex-col justify-center px-4 active:scale-95 transition-all outline-none"
             >
-               <div className="text-[11px] uppercase tracking-wide font-extrabold opacity-80 mb-0.5">Pay Using</div>
+               <div className="text-xs uppercase tracking-wide font-extrabold opacity-80 mb-0.5">Pay Using</div>
                <div className="flex items-center justify-between">
-                   <span className="text-sm">Cash on Delivery</span>
-                   <span className="text-base font-extrabold ml-1">›</span>
+                   <span className="text-sm sm:text-base font-bold">Cash on Delivery</span>
+                   <span className="text-base sm:text-lg font-extrabold ml-1">›</span>
                </div>
             </button>
         </div>

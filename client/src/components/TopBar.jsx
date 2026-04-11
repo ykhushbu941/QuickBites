@@ -8,8 +8,9 @@ export default function TopBar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Hide TopBar on reels, auth pages
-  if (["/login", "/register", "/reels"].includes(location.pathname)) return null;
+  // Hide TopBar entirely on auth pages
+  if (["/login", "/register"].includes(location.pathname)) return null;
+  const isReels = location.pathname === "/reels";
 
   const handleLogout = () => {
     logout();
@@ -21,36 +22,42 @@ export default function TopBar() {
   };
 
   return (
-    <div className="fixed top-0 w-full glass-panel h-16 z-40 bg-brand-dark/98 border-b border-white/5">
-      <div className="flex justify-between items-center h-full px-4 max-w-md mx-auto">
+    <div className={`fixed top-0 w-full glass-panel h-16 z-40 bg-brand-dark/98 border-b border-white/5 ${isReels ? 'hidden md:block' : ''}`}>
+      <div className="flex justify-between items-center h-full px-4 md:px-8 max-w-md md:max-w-7xl mx-auto relative">
         
-        {/* Left Side: Deliver To */}
-        <div 
-           className="flex flex-col justify-center cursor-pointer hover:opacity-80 transition-opacity"
-           onClick={() => {
-               const newAddr = window.prompt("Enter new delivery location (Mock)", user?.address || "");
-               if (newAddr && newAddr.trim() !== "") {
-                   alert("Location updated to: " + newAddr);
-                   // Full implementation would update backend and context
-               }
-           }}
-        >
-            <div className="flex items-center space-x-1">
-                <MapPin className="w-4 h-4 text-[#FC8019] fill-[#FC8019]/20" />
-                <h1 className="font-bold text-sm text-white tracking-tight flex items-center">
-                    Home <ChevronDown className="w-3 h-3 ml-1 text-gray-400" />
-                </h1>
+        {/* Left Side: Location */}
+        <div className="flex items-center space-x-6 z-10">
+            <div 
+               className="flex flex-col justify-center cursor-pointer hover:opacity-80 transition-opacity"
+               onClick={() => {
+                   const newAddr = window.prompt("Enter new delivery location (Mock)", user?.address || "");
+                   if (newAddr && newAddr.trim() !== "") {
+                       alert("Location updated to: " + newAddr);
+                   }
+               }}
+            >
+                <div className="flex items-center space-x-1">
+                    <MapPin className="w-5 h-5 sm:w-4 sm:h-4 text-[#FC8019] fill-[#FC8019]/20" />
+                    <h2 className="font-bold text-base sm:text-sm text-white tracking-tight flex items-center">
+                        Home <ChevronDown className="w-4 h-4 ml-1 text-gray-400" />
+                    </h2>
+                </div>
+                <p className="text-[11px] sm:text-xs text-gray-400 truncate max-w-[200px] ml-6 sm:ml-5">
+                     {user?.address || "Delivery location"}
+                </p>
             </div>
-            <p className="text-[10px] text-gray-400 truncate max-w-[200px] ml-5">
-                 {user?.address || "Select a delivery location"}
-            </p>
+        </div>
+
+        {/* Center: Brand */}
+        <div className="absolute left-1/2 -translate-x-1/2 z-0">
+          <h1 className="font-extrabold text-xl md:text-2xl tracking-tight text-white cursor-pointer" onClick={() => navigate('/home')}>QuickBites</h1>
         </div>
         
         {/* Right Side: Profile & Logout */}
         {user && (
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4 sm:space-x-3 z-10">
              <div 
-               className="w-8 h-8 rounded-full bg-gradient-to-tr from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold text-xs shadow-md shadow-brand-primary/20 cursor-pointer"
+               className="w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold text-sm sm:text-xs shadow-md shadow-brand-primary/20 cursor-pointer"
                onClick={() => navigate('/profile')}
              >
                 {getInitials(user.name)}
@@ -58,7 +65,7 @@ export default function TopBar() {
              
              <button
               onClick={handleLogout}
-              className="p-1.5 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
+              className="p-2 sm:p-1.5 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
              >
               <LogOut className="w-4 h-4 text-gray-300" />
              </button>

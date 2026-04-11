@@ -55,7 +55,7 @@ export default function Login() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-primary to-brand-secondary mb-4 shadow-lg shadow-brand-primary/30">
             <span className="text-3xl">🍔</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">ReelBite</h1>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight">QuickBites</h1>
           <p className="text-gray-400 text-sm mt-1">Discover food, one reel at a time</p>
         </div>
 

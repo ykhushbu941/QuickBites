@@ -34,7 +34,7 @@ export default function AddFood() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen px-4 py-8">
+    <div className="max-w-md md:max-w-2xl mx-auto min-h-screen px-4 py-8">
       <div className="mb-8">
          <h1 className="text-2xl font-bold text-white mb-2">Partner Dashboard</h1>
          <p className="text-brand-primary text-sm font-medium">Upload a new Food Reel</p>

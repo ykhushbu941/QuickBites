@@ -37,40 +37,40 @@ export default function NearbyRestaurants({ foods, onRestaurantClick }) {
   return (
     <div className="mt-6 mb-2">
       <div className="flex justify-between items-end mb-3">
-        <h2 className="font-bold text-[17px] text-white">Top Brands Near You</h2>
+        <h2 className="font-bold text-lg md:text-xl text-white">Top Brands Near You</h2>
       </div>
 
-      <div className="flex overflow-x-auto space-x-4 no-scrollbar pb-4 -mx-4 px-4 snap-x snap-mandatory">
+      <div className="flex overflow-x-auto space-x-5 no-scrollbar pb-4 -mx-4 px-4 snap-x snap-mandatory">
         {restaurants.map((rest, i) => (
           <div 
              key={i} 
              onClick={() => onRestaurantClick && onRestaurantClick(rest.name)}
-             className="min-w-[260px] max-w-[260px] snap-center bg-brand-gray rounded-[1.25rem] overflow-hidden shadow-lg border border-white/5 flex flex-col shrink-0 cursor-pointer hover:border-brand-primary/50 transition-colors"
+             className="min-w-[280px] max-w-[280px] md:min-w-[320px] md:max-w-[320px] snap-center bg-brand-gray rounded-[1.25rem] overflow-hidden shadow-lg border border-white/5 flex flex-col shrink-0 cursor-pointer hover:border-brand-primary/50 transition-colors"
           >
             {/* Image Banner */}
-            <div className="h-32 w-full relative">
+            <div className="h-36 md:h-40 w-full relative">
                <img src={rest.image} alt={rest.name} className="w-full h-full object-cover" />
                <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent" />
-               <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold text-white flex items-center shadow-sm border border-white/10 uppercase tracking-widest">
+               <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md text-[11px] font-extrabold text-white flex items-center shadow-sm border border-white/10 uppercase tracking-widest">
                   PROMOTED
                </div>
             </div>
 
             {/* Details */}
-            <div className="p-3 bg-[#2A2A2A] flex-grow">
-               <div className="flex justify-between items-start mb-1">
-                  <h3 className="font-bold text-white truncate max-w-[170px] text-[15px]">{rest.name}</h3>
-                  <div className="flex items-center bg-green-700 text-white px-1.5 py-0.5 rounded text-[11px] font-bold">
-                     {rest.rating} <Star className="w-2.5 h-2.5 ml-0.5 fill-white" />
+            <div className="p-4 bg-[#2A2A2A] flex-grow">
+               <div className="flex justify-between items-start mb-1.5">
+                  <h3 className="font-bold text-white truncate max-w-[180px] text-base md:text-lg">{rest.name}</h3>
+                  <div className="flex items-center bg-green-700 text-white px-2 py-0.5 rounded text-xs font-bold shadow-sm">
+                     {rest.rating} <Star className="w-3 h-3 ml-1 fill-white" />
                   </div>
                </div>
                
-               <p className="text-xs text-white/50 truncate mb-2"> {/* cuisines */}
+               <p className="text-sm text-gray-400 truncate mb-3"> {/* cuisines */}
                    {rest.cuisines.length > 0 ? rest.cuisines.join(", ") : "Multi-cuisine"}
                </p>
 
-               <div className="flex items-center text-[#FC8019] text-xs font-semibold bg-[#FC8019]/10 w-fit px-2 py-1 rounded-md">
-                   <Clock className="w-3.5 h-3.5 mr-1" /> {rest.time}
+               <div className="flex items-center text-[#FC8019] text-sm font-bold bg-[#FC8019]/10 w-fit px-3 py-1.5 rounded-lg border border-[#FC8019]/20">
+                   <Clock className="w-4 h-4 mr-1.5" /> {rest.time}
                </div>
             </div>
           </div>

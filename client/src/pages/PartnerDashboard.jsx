@@ -49,7 +49,7 @@ export default function PartnerDashboard() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen px-4 py-6 pb-24">
+    <div className="max-w-md md:max-w-6xl mx-auto min-h-screen px-4 py-6 pb-24">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white mb-1">Partner Dashboard</h1>
         <p className="text-brand-primary text-sm font-medium">Manage incoming orders</p>
@@ -66,9 +66,9 @@ export default function PartnerDashboard() {
            <p className="text-gray-400 text-sm">When users order your dishes, they will appear here for you to manage.</p>
         </div>
       ) : (
-        <div className="space-y-5">
+        <div className="space-y-5 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6">
           {orders.map((order) => (
-            <div key={order._id} className={`glass-panel p-5 rounded-2xl border-l-4 ${
+            <div key={order._id} className={`glass-panel p-5 rounded-2xl border-l-4 h-full flex flex-col justify-between ${
               order.status === 'Cancelled' ? 'border-l-red-500 bg-red-900/10 opacity-75' : 'border-l-brand-primary'
             }`}>
               {/* Header */}

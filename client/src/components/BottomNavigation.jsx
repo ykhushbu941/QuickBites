@@ -9,8 +9,8 @@ export default function BottomNavigation() {
   const { getCartCount } = useContext(CartContext);
   const { role } = useContext(AuthContext);
   
-  // Don't show bottom nav on login/register pages
-  if (["/login", "/register"].includes(location.pathname)) return null;
+  // Don't show bottom nav on landing, login, or register pages
+  if (["/", "/login", "/register"].includes(location.pathname)) return null;
 
   const NavItem = ({ to, icon: Icon, label }) => {
     const isActive = location.pathname === to;
@@ -23,14 +23,14 @@ export default function BottomNavigation() {
         )}
 
         <div className="relative mt-1">
-          <Icon className={`w-5 h-5 ${isActive ? 'fill-brand-primary/10' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
+          <Icon className={`w-6 h-6 sm:w-7 sm:h-7 ${isActive ? 'fill-brand-primary/10' : ''}`} strokeWidth={isActive ? 2.5 : 2} />
           {label === 'Cart' && getCartCount() > 0 && (
-            <span className="absolute -top-1.5 -right-2 bg-brand-secondary text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center animate-fade-in shadow-md">
+            <span className="absolute -top-1.5 -right-2 bg-brand-secondary text-white text-[11px] font-bold rounded-full w-5 h-5 flex items-center justify-center animate-fade-in shadow-md">
               {getCartCount()}
             </span>
           )}
         </div>
-        <span className="text-[10px] font-medium">{label}</span>
+        <span className="text-[11px] sm:text-xs font-semibold">{label}</span>
       </Link>
     );
   };

@@ -39,7 +39,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen px-4 py-6">
+    <div className="max-w-md md:max-w-4xl mx-auto min-h-screen px-4 py-6">
       
       {/* Profile Header */}
       <div className="glass-panel p-6 rounded-3xl flex items-center space-x-5 mb-8">
@@ -86,9 +86,9 @@ export default function ProfilePage() {
            <p className="text-gray-400">No orders yet.</p>
         </div>
       ) : (
-        <div className="space-y-4 pb-20">
+        <div className="space-y-4 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-2 md:gap-6 pb-20">
           {orders.map((order) => (
-            <div key={order._id} className="glass-panel p-5 rounded-2xl border-l-4 border-l-brand-primary">
+            <div key={order._id} className="glass-panel p-5 rounded-2xl border-l-4 border-l-brand-primary h-full flex flex-col justify-between">
               <div className="flex justify-between items-start mb-3">
                 <div className="text-xs text-gray-400">Order #{order._id.substring(order._id.length - 6)}</div>
                 <div className="flex items-center space-x-3">

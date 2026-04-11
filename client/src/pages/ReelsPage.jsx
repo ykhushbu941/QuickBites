@@ -402,7 +402,7 @@ export default function ReelsPage() {
     <div className="bg-black w-full fixed inset-0 z-10 overflow-hidden sm:bg-[#121212]">
       
       {/* Top Filter Overlay (Instagram For You / Following Style) */}
-      <div className="absolute top-12 left-0 right-0 z-50 flex justify-center space-x-6 items-center">
+      <div className="absolute top-12 md:top-20 left-0 right-0 z-50 flex justify-center space-x-6 items-center">
           <button onClick={() => setFilter("all")} className={`text-[15px] font-bold drop-shadow-md transition-all ${filter === "all" ? "text-white" : "text-white/50"}`}>For You</button>
           
           <div className="w-1 h-1 rounded-full bg-white/30 drop-shadow-md"></div>
@@ -420,7 +420,7 @@ export default function ReelsPage() {
 
       <div 
          ref={containerRef}
-         className="h-full w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar sm:py-4 pt-4"
+         className="h-full w-full overflow-y-scroll snap-y snap-mandatory no-scrollbar sm:py-4 pt-4 md:pt-16"
       >
         {filteredFoods.length === 0 ? (
           <div className="h-full w-full flex items-center justify-center bg-transparent pointer-events-none text-white/50">

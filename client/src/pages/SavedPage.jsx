@@ -37,7 +37,7 @@ export default function SavedPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen px-4 py-8 space-y-6">
+    <div className="max-w-md md:max-w-7xl mx-auto min-h-screen px-4 py-8 space-y-6">
       <div className="flex items-center space-x-2 mb-6">
         <Bookmark className="w-6 h-6 text-brand-primary" fill="currentColor" />
         <h1 className="text-2xl font-bold text-white">Saved Reels</h1>
@@ -58,7 +58,7 @@ export default function SavedPage() {
             <Link to="/reels" className="mt-6 bg-brand-primary/20 text-brand-primary px-6 py-2 rounded-full font-semibold border border-brand-primary/30">Explore Reels</Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {foods.map(food => (
               <div 
                 key={food._id} 
