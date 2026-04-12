@@ -119,7 +119,7 @@ export default function TrackOrderPage() {
       </div>
 
       {/* Content Area */}
-      <div className="flex-grow max-w-2xl mx-auto w-full px-4 py-8 space-y-8 pb-24">
+      <div className="flex-grow max-w-2xl mx-auto w-full px-4 py-8 space-y-8 pb-40">
         
         {/* Delivery Partner */}
         {!isCancelled && order.status !== "Delivered" && (

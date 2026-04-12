@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { X, Star, Clock, MapPin, Plus, Minus, Video } from "lucide-react";
+import { X, Star, Clock, MapPin, Plus, Minus, Video, ArrowRight } from "lucide-react";
 import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
@@ -48,7 +48,7 @@ export default function FoodDetailModal({ food, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4 pointer-events-none">
+    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-0 sm:p-4 pointer-events-none">
       
       {/* Backdrop */}
       <div 

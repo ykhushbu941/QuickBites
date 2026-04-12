@@ -34,7 +34,7 @@ export default function AddFood() {
   };
 
   return (
-    <div className="max-w-md md:max-w-2xl mx-auto min-h-screen px-4 py-8 pt-20 bg-[var(--bg-primary)] transition-colors duration-300">
+    <div className="max-w-md md:max-w-2xl mx-auto min-h-screen px-4 py-8 pb-32 pt-20 bg-[var(--bg-primary)] transition-colors duration-300">
       <div className="mb-8 flex items-center justify-between">
          <div>
             <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter mb-1">Add New Reel</h1>

@@ -56,7 +56,7 @@ function PartnerRoute({ children }) {
 export default function App() {
   return (
     <ThemeProvider>
-      <div className="bg-[var(--bg-primary)] min-h-screen font-sans antialiased text-[var(--text-primary)] pb-16 pt-14 relative transition-colors duration-300">
+      <div className="bg-[var(--bg-primary)] min-h-screen font-sans antialiased text-[var(--text-primary)] pb-32 pt-14 relative transition-colors duration-300">
         <TopBar />
 
       <Routes>

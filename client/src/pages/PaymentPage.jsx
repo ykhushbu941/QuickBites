@@ -95,7 +95,7 @@ export default function PaymentPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] pt-16 pb-24 transition-colors">
+    <div className="min-h-screen bg-[var(--bg-primary)] pt-16 pb-40 transition-colors">
       {/* Header & Stepper */}
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex items-center gap-4 mb-8">

@@ -39,7 +39,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-md md:max-w-4xl mx-auto min-h-screen px-4 py-8 pt-20 bg-[var(--bg-primary)] transition-colors duration-300">
+    <div className="max-w-md md:max-w-4xl mx-auto min-h-screen px-4 py-8 pb-40 pt-20 bg-[var(--bg-primary)] transition-colors duration-300">
       
       {/* Profile Header */}
       <div className="bg-[var(--bg-surface)] p-8 rounded-[2.5rem] flex items-center space-x-6 mb-10 shadow-xl shadow-black/[0.03] border border-[var(--border-color)]">
@@ -108,7 +108,7 @@ export default function ProfilePage() {
            <button onClick={() => navigate('/home')} className="bg-[var(--brand-orange)] text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all shadow-lg shadow-orange-500/20">Browse Menu</button>
         </div>
       ) : (
-        <div className="space-y-6 md:grid md:grid-cols-2 md:gap-8 pb-32">
+        <div className="space-y-6 md:grid md:grid-cols-2 md:gap-8 pb-10">
           {orders.map((order) => (
             <div 
               key={order._id} 

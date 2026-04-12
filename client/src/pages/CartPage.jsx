@@ -58,7 +58,7 @@ export default function CartPage() {
   const restaurantName = cart[0]?.food?.restaurant || "Restaurant";
 
   return (
-    <div className="max-w-md md:max-w-7xl mx-auto min-h-screen bg-[var(--bg-primary)] pb-[140px] md:pb-[100px] transition-colors duration-300">
+    <div className="max-w-md md:max-w-7xl mx-auto min-h-screen bg-[var(--bg-primary)] pb-[200px] md:pb-[120px] transition-colors duration-300">
       
       {/* Header */}
       <div className="bg-[var(--glass-bg)] px-4 py-4 pt-16 flex items-center shadow-sm border-b border-[var(--border-color)] transition-colors">
