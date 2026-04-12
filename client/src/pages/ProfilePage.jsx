@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import { LogOut, Package, MapPin, Phone, Coffee } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { LogOut, Package, MapPin, Phone, Coffee, Settings, ChevronRight } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function ProfilePage() {
   const { user, logout } = useContext(AuthContext);
@@ -46,9 +46,16 @@ export default function ProfilePage() {
         <div className="w-24 h-24 bg-gradient-to-tr from-[var(--brand-orange)] to-[var(--brand-yellow)] rounded-full flex items-center justify-center text-4xl font-black text-white shadow-2xl shadow-orange-500/20">
           {user?.name?.charAt(0).toUpperCase() || "U"}
         </div>
-        <div>
-          <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter leading-tight">{user?.name}</h2>
-          <p className="text-[var(--text-secondary)] font-bold text-sm">{user?.email}</p>
+        <div className="flex-grow">
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter leading-tight">{user?.name}</h2>
+              <p className="text-[var(--text-secondary)] font-bold text-sm">{user?.email}</p>
+            </div>
+            <Link to="/edit-profile" className="p-3 bg-[var(--bg-primary)] rounded-2xl border border-[var(--border-color)] hover:bg-[var(--brand-orange)]/10 hover:border-[var(--brand-orange)]/20 transition-all group">
+               <Settings className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--brand-orange)] transition-colors" />
+            </Link>
+          </div>
           <div className="flex gap-2 mt-3">
             <span className="px-3 py-1 bg-[var(--brand-orange)]/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-[var(--brand-orange)]">
                 {user?.role}
@@ -103,7 +110,11 @@ export default function ProfilePage() {
       ) : (
         <div className="space-y-6 md:grid md:grid-cols-2 md:gap-8 pb-32">
           {orders.map((order) => (
-            <div key={order._id} className="bg-[var(--bg-surface)] p-6 rounded-[2rem] border border-[var(--border-color)] shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden group">
+            <div 
+              key={order._id} 
+              onClick={() => navigate(`/track-order/${order._id}`)}
+              className="bg-[var(--bg-surface)] p-6 rounded-[2rem] border border-[var(--border-color)] shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden group cursor-pointer"
+            >
               <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[var(--brand-orange)]/5 to-transparent -mr-8 -mt-8 rounded-full" />
               
               <div className="flex justify-between items-start mb-6 relative z-10">
@@ -120,7 +131,15 @@ export default function ProfilePage() {
                     {order.status}
                   </div>
                   {order.status === "Pending" && (
-                     <button onClick={() => cancelOrder(order._id)} className="text-[10px] font-black text-red-500 hover:bg-red-500/10 px-2 py-1 rounded-lg transition-colors uppercase tracking-widest">Cancel</button>
+                     <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          cancelOrder(order._id);
+                        }} 
+                        className="text-[10px] font-black text-red-500 hover:bg-red-500/10 px-2 py-1 rounded-lg transition-colors uppercase tracking-widest"
+                      >
+                        Cancel
+                      </button>
                   )}
                 </div>
               </div>
@@ -138,7 +157,11 @@ export default function ProfilePage() {
               </div>
 
               <div className="flex justify-between items-center pt-5 border-t border-[var(--border-color)] mt-auto relative z-10">
-                <span className="text-[var(--text-secondary)] font-bold text-xs">{new Date(order.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</span>
+                <div className="flex items-center gap-3">
+                   <span className="text-[var(--text-secondary)] font-bold text-xs">{new Date(order.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</span>
+                   <div className="w-1 h-1 rounded-full bg-[var(--border-color)]" />
+                   <span className="text-[10px] font-black text-[var(--brand-orange)] uppercase tracking-widest flex items-center group-hover:translate-x-1 transition-transform">Track <ChevronRight className="w-3 h-3 ml-0.5" /></span>
+                </div>
                 <span className="font-black text-xl tracking-tighter text-[var(--text-primary)]">₹{order.totalAmount}</span>
               </div>
             </div>

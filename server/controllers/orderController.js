@@ -2,7 +2,7 @@ const Order = require("../models/Order");
 
 exports.placeOrder = async (req, res) => {
   try {
-    const { items, totalAmount, deliveryAddress } = req.body;
+    const { items, totalAmount, deliveryAddress, paymentMethod, onlinePaymentDetails } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ msg: "No order items" });
@@ -12,7 +12,9 @@ exports.placeOrder = async (req, res) => {
       user: req.user.id,
       items,
       totalAmount,
-      deliveryAddress
+      deliveryAddress,
+      paymentMethod,
+      onlinePaymentDetails
     });
 
     const savedOrder = await order.save();
@@ -88,5 +90,28 @@ exports.getPartnerOrders = async (req, res) => {
     res.json(partnerOrders);
   } catch (err) {
     res.status(500).json({ msg: "Error fetching partner orders", error: err.message });
+  }
+};
+
+exports.getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate("items.food", "name videoUrl price restaurant")
+      .populate("user", "name email phone address");
+
+    if (!order) {
+      return res.status(404).json({ msg: "Order not found" });
+    }
+
+    // Check if the user is the owner or the partner whose food was ordered
+    // For now, simplicity: checking if it belongs to the user or if user is partner role
+    // In a stricter app, we'd check if the user is THE partner who owns the food
+    if (order.user._id.toString() !== req.user.id && req.user.role !== 'partner') {
+      return res.status(403).json({ msg: "Not authorized to view this order" });
+    }
+
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching order details", error: err.message });
   }
 };

@@ -12,6 +12,9 @@ import HomePage from "./pages/HomePage";
 import CartPage from "./pages/CartPage";
 import ProfilePage from "./pages/ProfilePage";
 import SavedPage from "./pages/SavedPage";
+import PaymentPage from "./pages/PaymentPage";
+import EditProfilePage from "./pages/EditProfilePage";
+import TrackOrderPage from "./pages/TrackOrderPage";
 
 import { ThemeProvider } from "./context/ThemeContext";
 
@@ -106,6 +109,33 @@ export default function App() {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/edit-profile"
+          element={
+            <ProtectedRoute>
+              <EditProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute>
+              <PaymentPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/track-order/:orderId"
+          element={
+            <ProtectedRoute>
+              <TrackOrderPage />
             </ProtectedRoute>
           }
         />

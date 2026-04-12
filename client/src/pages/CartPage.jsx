@@ -16,29 +16,7 @@ export default function CartPage() {
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
-    setLoading(true);
-
-    try {
-      const orderData = {
-        items: cart.map(item => ({
-          food: item.food._id,
-          quantity: item.quantity,
-          price: item.price
-        })),
-        totalAmount: calculateTotal() + 5, // including platform fee
-        deliveryAddress: user?.address || "Default Address"
-      };
-
-      await axios.post("/api/orders", orderData);
-      clearCart();
-      alert("Order placed successfully!");
-      navigate("/profile");
-    } catch (err) {
-      alert("Failed to place order");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    navigate("/payment");
   };
 
   const calculateTotal = () => {

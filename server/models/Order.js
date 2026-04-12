@@ -36,6 +36,15 @@ const orderSchema = new mongoose.Schema({
   deliveryAddress: {
     type: String,
     required: true
+  },
+  paymentMethod: {
+    type: String,
+    enum: ["upi", "card", "wallet", "cod"],
+    default: "cod"
+  },
+  onlinePaymentDetails: {
+    upiId: String,
+    cardLastFour: String
   }
 }, { timestamps: true });
 
