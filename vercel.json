@@ -11,6 +11,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://quickbites-backend-738z.onrender.com/api/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/client/$1"
     }
