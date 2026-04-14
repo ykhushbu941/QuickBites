@@ -20,16 +20,10 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const res = await API.get(`/auth/user/check-role?email=${email}`);
-      const userRole = res.data.role;
-
-      if (userRole && userRole !== loginType) {
-        setLoading(false);
-        setError(`This account is registered as a ${userRole === "partner" ? "Partner" : "Foodie"}. Please switch to the correct tab.`);
-        return;
-      }
-
+      // 🔑 Simplified login: directly call the login endpoint
       const loginRes = await API.post("/auth/user/login", { email, password });
+      
+      console.log("✅ Login successful:", loginRes.data);
       login(loginRes.data.token, loginRes.data.role, loginRes.data.user);
       
       if (loginRes.data.role === "partner") {
@@ -38,19 +32,9 @@ export default function Login() {
         navigate("/home");
       }
     } catch (err) {
-      console.error(err);
-      // If check-role fails, just try to login anyway (maybe legacy account)
-      try {
-        const res = await API.post("/auth/user/login", { email, password });
-        login(res.data.token, res.data.role, res.data.user);
-        if (res.data.role === "partner") {
-          navigate("/dashboard");
-        } else {
-          navigate("/home");
-        }
-      } catch (loginErr) {
-        setError(loginErr.response?.data?.msg || loginErr.message || "Failed to login.");
-      }
+      console.error("❌ Login Error:", err);
+      const msg = err.response?.data?.msg || err.message || "Login failed. Please check your connection.";
+      setError(msg);
     } finally {
       setLoading(false);
     }

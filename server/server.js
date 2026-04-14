@@ -1,17 +1,14 @@
 require("dotenv").config();
 
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
+const { initDb } = require("./db");
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
 const foodRoutes = require("./routes/foodRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
-
-// Models
-const Food = require("./models/Food");
 
 // Middleware
 const errorHandler = require("./middleware/errorMiddleware");
@@ -20,15 +17,23 @@ const app = express();
 
 // 🔧 Middlewares
 app.use(cors({
-  origin: "*", 
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: true, // Reflect request origin
   credentials: true
 }));
 app.use(express.json());
 
-// 🔍 Health Check Route (Production practice)
+// 📝 Request Logger
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// 🗄️ Initialise Local JSON Database (seeds data if empty)
+initDb();
+
+// 🔍 Health Check
 app.get("/", (req, res) => {
-  res.send("🚀 ReelBite API Running...");
+  res.send("🚀 ReelBite API Running (Local JSON)...");
 });
 
 // 🔐 API Routes
@@ -37,26 +42,12 @@ app.use("/api/foods", foodRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 
-const path = require("path");
-
 // ❌ Error Handling Middleware (must be last)
 app.use(errorHandler);
 
-// Note: Static frontend serving is handled by Vercel in production.
-// This allows the backend to focus purely on the API.
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
 
-// 🌐 Database Connection
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("✅ MongoDB Connected"))
-.catch((err) => console.error("❌ DB Connection Error:", err.message));
-
-// Only skip listen() if we are on Vercel (serverless mode)
-if (!process.env.VERCEL) {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  });
-}
-
-// Export for Vercel Serverless Function
 module.exports = app;

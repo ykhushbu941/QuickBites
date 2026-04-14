@@ -1,41 +1,50 @@
 const express = require("express");
 const { protect } = require("../middleware/authMiddleware");
-const Review = require("../models/Review");
-const Food = require("../models/Food");
+const { db, newId } = require("../db");
 
 const router = express.Router();
 
-// @route   POST /api/reviews
-// @desc    Add a review
-// @access  Private
+// POST /api/reviews — Add a review
 router.post("/", protect, async (req, res) => {
   try {
     const { foodId, rating, comment } = req.body;
 
-    const review = new Review({
-      user: req.user.id,
-      food: foodId,
+    const review = {
+      id: newId(),
+      userId: req.user.id,
+      foodId,
       rating,
-      comment
-    });
+      comment,
+      createdAt: new Date().toISOString()
+    };
 
-    await review.save();
-    res.status(201).json(review);
+    db.get("reviews").push(review).write();
+
+    const user = db.get("users").find({ id: req.user.id }).value();
+    res.status(201).json({
+      ...review,
+      _id: review.id,
+      user: { _id: req.user.id, name: user ? user.name : "User" }
+    });
   } catch (err) {
     res.status(500).json({ msg: "Error adding review", error: err.message });
   }
 });
 
-// @route   GET /api/reviews/food/:foodId
-// @desc    Get reviews for a food item
-// @access  Public
+// GET /api/reviews/food/:foodId — Get reviews for a food
 router.get("/food/:foodId", async (req, res) => {
   try {
-    const reviews = await Review.find({ food: req.params.foodId })
-      .populate("user", "name")
-      .sort({ createdAt: -1 });
+    const reviews = db.get("reviews")
+      .filter({ foodId: req.params.foodId })
+      .value()
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    res.json(reviews);
+    const enriched = reviews.map(r => {
+      const user = db.get("users").find({ id: r.userId }).value();
+      return { ...r, _id: r.id, user: user ? { _id: user.id, name: user.name } : null };
+    });
+
+    res.json(enriched);
   } catch (err) {
     res.status(500).json({ msg: "Error fetching reviews", error: err.message });
   }

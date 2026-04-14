@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
+import API from "../api/api";
 
 export const AuthContext = createContext();
 
@@ -12,20 +13,18 @@ export const AuthProvider = ({ children }) => {
   // Configure axios default
   useEffect(() => {
     if (token) {
-      axios.defaults.headers.common["Authorization"] = token;
       fetchUser();
     } else {
-      delete axios.defaults.headers.common["Authorization"];
       setLoading(false);
     }
   }, [token]);
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get("/api/auth/user/me");
+      const res = await API.get("/auth/user/me");
       setUser(res.data);
     } catch (error) {
-      console.error("Token invalid or expired");
+      console.error("Token invalid or expired", error);
       logout();
     } finally {
       setLoading(false);

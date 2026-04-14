@@ -1,74 +1,63 @@
-const Food = require("../models/Food");
+const { db, newId } = require("../db");
 
-// ✅ GET FOODS (Pagination + Latest First + Filters)
+function parseFood(f) {
+  if (!f) return null;
+  return { ...f, _id: f.id };
+}
+
+// ✅ GET FOODS (Pagination + Filters)
 exports.getFoods = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
-    
-    // Add filtering
-    const keyword = req.query.keyword
-      ? {
-          $or: [
-            { name: { $regex: req.query.keyword, $options: "i" } },
-            { restaurant: { $regex: req.query.keyword, $options: "i" } }
-          ]
-        }
-      : {};
+    const keyword = req.query.keyword ? req.query.keyword.toLowerCase() : null;
+    const category = req.query.category && req.query.category !== "All" ? req.query.category : null;
+    const cuisine = req.query.cuisine && req.query.cuisine !== "All" ? req.query.cuisine : null;
+    const isVeg = req.query.isVeg;
 
-    const category = req.query.category && req.query.category !== "All"
-      ? { category: req.query.category }
-      : {};
+    let foods = db.get("foods").value();
 
-    const cuisine = req.query.cuisine && req.query.cuisine !== "All"
-      ? { cuisine: req.query.cuisine }
-      : {};
+    // Sort newest first
+    foods = [...foods].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    const vegFilter = req.query.isVeg === "true"
-      ? { isVeg: true }
-      : req.query.isVeg === "false"
-      ? { isVeg: false }
-      : {};
+    // Apply filters
+    if (keyword) {
+      foods = foods.filter(f =>
+        f.name.toLowerCase().includes(keyword) ||
+        f.restaurant.toLowerCase().includes(keyword)
+      );
+    }
+    if (category) foods = foods.filter(f => f.category === category);
+    if (cuisine) foods = foods.filter(f => f.cuisine === cuisine);
+    if (isVeg === "true") foods = foods.filter(f => f.isVeg === true);
+    if (isVeg === "false") foods = foods.filter(f => f.isVeg === false);
 
-    const foods = await Food.find({ ...keyword, ...category, ...cuisine, ...vegFilter })
-      .populate("comments.user", "name")
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+    // Paginate
+    const paginated = foods.slice((page - 1) * limit, page * limit);
 
-    res.json(foods);
-
+    res.json(paginated.map(parseFood));
   } catch (err) {
-    res.status(500).json({ msg: "Error fetching foods" });
+    res.status(500).json({ msg: "Error fetching foods", error: err.message });
   }
 };
 
 // ✅ LIKE / UNLIKE (Toggle)
 exports.likeFood = async (req, res) => {
   try {
-    const food = await Food.findById(req.params.id);
-
-    if (!food) {
-      return res.status(404).json({ msg: "Food not found" });
-    }
+    const food = db.get("foods").find({ id: req.params.id }).value();
+    if (!food) return res.status(404).json({ msg: "Food not found" });
 
     const userId = req.user.id;
+    let likes = [...(food.likes || [])];
+    const idx = likes.indexOf(userId);
+    if (idx > -1) likes.splice(idx, 1);
+    else likes.push(userId);
 
-    // If already liked → remove (unlike)
-    if (food.likes.includes(userId)) {
-      food.likes = food.likes.filter(
-        (id) => id.toString() !== userId
-      );
-    } else {
-      // Else → add like
-      food.likes.push(userId);
-    }
-
-    await food.save();
-    res.json(food);
-
+    db.get("foods").find({ id: req.params.id }).assign({ likes }).write();
+    const updated = db.get("foods").find({ id: req.params.id }).value();
+    res.json(parseFood(updated));
   } catch (err) {
-    res.status(500).json({ msg: "Error liking food" });
+    res.status(500).json({ msg: "Error liking food", error: err.message });
   }
 };
 
@@ -76,79 +65,67 @@ exports.likeFood = async (req, res) => {
 exports.addFood = async (req, res) => {
   try {
     const { name, videoUrl, price, restaurant, description, category, imageUrl, restaurantImageUrl, isVeg, cuisine } = req.body;
-
     if (!name || !videoUrl || !price || !restaurant) {
       return res.status(400).json({ msg: "All required fields must be filled" });
     }
 
-    const food = new Food({
+    const food = {
+      id: newId(),
       name,
       videoUrl,
+      imageUrl: imageUrl || "",
+      restaurantImageUrl: restaurantImageUrl || "",
       price,
       restaurant,
-      description,
-      category,
-      imageUrl,
-      restaurantImageUrl,
-      isVeg,
-      cuisine,
-      createdBy: req.user.id
-    });
+      description: description || "",
+      category: category || "Other",
+      isVeg: !!isVeg,
+      cuisine: cuisine || "Other",
+      createdBy: req.user.id,
+      likes: [],
+      comments: [],
+      createdAt: new Date().toISOString()
+    };
 
-    await food.save();
-
-    res.status(201).json(food);
-
+    db.get("foods").push(food).write();
+    res.status(201).json(parseFood(food));
   } catch (err) {
-    res.status(500).json({ msg: "Error adding food" });
+    res.status(500).json({ msg: "Error adding food", error: err.message });
   }
 };
 
 // ✅ DELETE FOOD (Only Owner)
 exports.deleteFood = async (req, res) => {
   try {
-    const food = await Food.findById(req.params.id);
+    const food = db.get("foods").find({ id: req.params.id }).value();
+    if (!food) return res.status(404).json({ msg: "Food not found" });
+    if (food.createdBy !== req.user.id) return res.status(403).json({ msg: "Not authorized" });
 
-    if (!food) {
-      return res.status(404).json({ msg: "Food not found" });
-    }
-
-    // Only creator can delete
-    if (food.createdBy.toString() !== req.user.id) {
-      return res.status(403).json({ msg: "Not authorized" });
-    }
-
-    await food.deleteOne();
-
+    db.get("foods").remove({ id: req.params.id }).write();
     res.json({ msg: "Food deleted successfully" });
-
   } catch (err) {
-    res.status(500).json({ msg: "Error deleting food" });
+    res.status(500).json({ msg: "Error deleting food", error: err.message });
   }
 };
 
-// ✅ ADD COMMENT TO FOOD
+// ✅ ADD COMMENT
 exports.addComment = async (req, res) => {
   try {
-    const food = await Food.findById(req.params.id);
-    if (!food) {
-      return res.status(404).json({ msg: "Food not found" });
-    }
-
+    const food = db.get("foods").find({ id: req.params.id }).value();
+    if (!food) return res.status(404).json({ msg: "Food not found" });
     const { text } = req.body;
-    if (!text) {
-      return res.status(400).json({ msg: "Comment text is required" });
-    }
+    if (!text) return res.status(400).json({ msg: "Comment text is required" });
 
-    const comment = {
-      user: req.user.id,
-      text
-    };
+    const user = db.get("users").find({ id: req.user.id }).value();
+    const comments = [...(food.comments || [])];
+    comments.push({
+      user: { id: req.user.id, name: user ? user.name : "User" },
+      text,
+      createdAt: new Date().toISOString()
+    });
 
-    food.comments.push(comment);
-    await food.save();
-
-    res.status(201).json(food.comments);
+    db.get("foods").find({ id: req.params.id }).assign({ comments }).write();
+    res.status(201).json(comments);
   } catch (err) {
     res.status(500).json({ msg: "Error adding comment", error: err.message });
   }

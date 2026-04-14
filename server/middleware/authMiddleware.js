@@ -9,7 +9,8 @@ exports.protect = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || "fallback_secret_for_emergency";
+    const decoded = jwt.verify(token, secret);
 
     req.user = decoded;
     next();

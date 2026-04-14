@@ -405,6 +405,7 @@ export default function ReelsPage() {
   }
 
   const filteredFoods = (foods || []).filter(food => {
+      if (!food) return false;
       if (filter === "veg") return food.isVeg;
       if (filter === "nonveg") return !food.isVeg;
       return true;
@@ -461,7 +462,7 @@ export default function ReelsPage() {
         ) : (
           filteredFoods.map((food, index) => (
             <Reel 
-              key={food._id} 
+              key={food._id || food.id || index} 
               food={food} 
               isActive={index === activeIndex} 
               isNext={index === activeIndex + 1} 
