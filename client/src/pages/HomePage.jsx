@@ -11,16 +11,16 @@ const CATEGORIES = ["All", "Pizza", "Burger", "Dessert", "Drinks", "Snacks", "He
 const CUISINES = ["All", "Indian", "South Indian", "Chinese", "Italian", "Mexican", "American", "Japanese", "Healthy", "Mediterranean"];
 
 const CUISINE_ICONS = {
-  All: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=200&auto=format&fit=crop", 
-  "Indian": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?q=80&w=200&auto=format&fit=crop", 
-  "South Indian": "https://images.unsplash.com/photo-1589301760014-d929f3979bdb?q=80&w=200&auto=format&fit=crop", 
-  "Chinese": "https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=200&auto=format&fit=crop",
-  "Italian": "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?q=80&w=200&auto=format&fit=crop", 
-  "Mexican": "https://images.unsplash.com/photo-1565299585323-38d6b0865597?q=80&w=200&auto=format&fit=crop", 
-  "American": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=200&auto=format&fit=crop", 
-  "Japanese": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=200&auto=format&fit=crop",
-  "Healthy": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=200&auto=format&fit=crop", 
-  "Mediterranean": "https://images.unsplash.com/photo-1544124499-58962f3bd3a7?q=80&w=200&auto=format&fit=crop"
+  All: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=300&auto=format&fit=crop", 
+  "Indian": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?q=80&w=300&auto=format&fit=crop", 
+  "South Indian": "https://images.unsplash.com/photo-1589301760014-d929f3979bdb?q=80&w=300&auto=format&fit=crop", 
+  "Chinese": "https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=300&auto=format&fit=crop",
+  "Italian": "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?q=80&w=300&auto=format&fit=crop", 
+  "Mexican": "https://images.unsplash.com/photo-1565299585323-38d6b0865597?q=80&w=300&auto=format&fit=crop", 
+  "American": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=300&auto=format&fit=crop", 
+  "Japanese": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=300&auto=format&fit=crop",
+  "Healthy": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=300&auto=format&fit=crop", 
+  "Mediterranean": "https://images.unsplash.com/photo-1544124499-58962f3bd3a7?q=80&w=300&auto=format&fit=crop"
 };
 
 export default function HomePage() {
@@ -330,17 +330,27 @@ export default function HomePage() {
                   {/* Image Overlay */}
                   <div className="h-60 sm:h-44 md:h-48 relative overflow-hidden">
                     {food.imageUrl ? (
-                      <img
-                        src={food.imageUrl}
-                        alt={food.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 dark:from-gray-800 dark:to-gray-700 items-center justify-center text-5xl" style={{display: food.imageUrl ? 'none' : 'flex'}}>🍽️</div>
+                      <div className="relative w-full h-full">
+                        <img
+                          src={food.imageUrl}
+                          alt={food.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                          onLoad={(e) => {
+                            e.target.style.opacity = 1;
+                            e.target.nextSibling.style.opacity = 0;
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                            e.target.nextSibling.style.opacity = 1;
+                          }}
+                          style={{ opacity: 0, transition: 'opacity 0.5s ease' }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center text-5xl transition-opacity duration-500">🍽️</div>
+                      </div>
+                    ) : (
+                       <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center text-5xl">🍽️</div>
+                    )}
 
                     {/* Top Badges */}
                     <div className="absolute top-4 left-4 flex flex-col space-y-2">

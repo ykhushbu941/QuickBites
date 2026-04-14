@@ -10,7 +10,7 @@ const dbPath = isProd ? path.join("/tmp", "db.json") : path.join(__dirname, "db.
 const adapter = new FileSync(dbPath);
 const db = low(adapter);
 
-const DB_VERSION = "v3"; // Bump to force re-seed on production
+const DB_VERSION = "v4"; // Bump to force re-seed on production
 
 // ─── Set Defaults ─────────────────────────────────────────────────
 function initDb() {
