@@ -3,9 +3,8 @@ services:
     name: reelbite-api
     env: node
     plan: free
-    buildCommand: npm install
-    startCommand: node server.js
-    rootDir: server
+    buildCommand: npm install --prefix server
+    startCommand: node server/server.js
     envVars:
       - key: NODE_ENV
         value: production
