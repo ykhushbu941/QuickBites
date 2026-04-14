@@ -50,16 +50,18 @@ export default function NearbyRestaurants({ foods, onRestaurantClick }) {
              onClick={() => onRestaurantClick && onRestaurantClick(rest.name)}
              className="min-w-[260px] max-w-[260px] md:min-w-[320px] md:max-w-[320px] snap-start bg-[var(--bg-surface)] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/[0.03] border border-[var(--border-color)] flex flex-col shrink-0 cursor-pointer hover:-translate-y-2 transition-all duration-500 ease-out group"
           >
-            {/* Image Banner */}
-            <div className="h-36 md:h-40 w-full relative overflow-hidden">
-               <img src={rest.image} alt={rest.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" />
-               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
-               <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black text-[#1C1C1C] flex items-center shadow-lg border border-black/5 uppercase tracking-widest">
-                  CURATED
+             {/* Image Banner */}
+            <div className="h-40 md:h-48 w-full relative overflow-hidden group">
+               <img src={rest.image} alt={rest.name} className="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-transform duration-1000 ease-out" />
+               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80" />
+               
+               <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-xl border border-white/20 px-3 py-1.5 rounded-xl text-[10px] font-black text-white flex items-center shadow-2xl uppercase tracking-widest">
+                  PREMIUM
                </div>
                
-               <div className="absolute bottom-4 left-4 flex items-center bg-[#3D9970] text-white px-2.5 py-1 rounded-lg text-xs font-black shadow-lg">
-                  {rest.rating} <Star className="w-3 h-3 ml-1 fill-white" />
+               {/* Rating Badge */}
+               <div className="absolute bottom-4 left-4 bg-white/20 backdrop-blur-xl border border-white/30 px-3 py-1.5 rounded-full text-[13px] font-black text-white flex items-center shadow-2xl">
+                  {rest.rating} <Star className="w-3.5 h-3.5 ml-1 fill-[var(--brand-orange)] text-[var(--brand-orange)]" />
                </div>
             </div>
 

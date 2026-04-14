@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const { initDb } = require("./db");
+const { db, initDb } = require("./db");
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
@@ -17,7 +17,7 @@ const app = express();
 
 // 🔧 Middlewares
 app.use(cors({
-  origin: true, // Reflect request origin
+  origin: ["http://localhost:5173", "http://127.0.0.1:5173", /\.vercel\.app$/],
   credentials: true
 }));
 app.use(express.json());
@@ -31,9 +31,36 @@ app.use((req, res, next) => {
 // 🗄️ Initialise Local JSON Database (seeds data if empty)
 initDb();
 
-// 🔍 Health Check
+// 🔍 Enhanced Health Check & Diagnostics
 app.get("/", (req, res) => {
-  res.send("🚀 ReelBite API Running (Local JSON)...");
+  const dbState = db ? db.getState() : null;
+  res.json({
+    msg: "🚀 ReelBite API Running!",
+    environment: process.env.NODE_ENV || "unknown",
+    render: !!process.env.RENDER,
+    diagnostics: {
+      dbReady: !!db,
+      dbSize: dbState ? Object.keys(dbState).length : 0,
+      userCount: dbState?.users?.length || 0,
+      foodCount: dbState?.foods?.length || 0,
+      hasJwtSecret: !!process.env.JWT_SECRET,
+      nodeVersion: process.version,
+      uptime: process.uptime()
+    },
+    time: new Date().toISOString()
+  });
+});
+
+// Remove the old /api/debug endpoint as it's now part of root /
+// app.get("/api/debug", ...);
+
+// 🛡️ Global Crash Protection
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("❌ Uncaught Exception:", err);
 });
 
 // 🔐 API Routes

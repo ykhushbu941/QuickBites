@@ -11,6 +11,9 @@ exports.register = async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
     const userId = newId();
+
+    // 🕒 Tiny delay to stabilize persistent connection/file handle
+    await new Promise(resolve => setTimeout(resolve, 150));
     const user = {
       id: userId,
       _id: userId, // Physically save _id in the DB
@@ -28,15 +31,22 @@ exports.register = async (req, res) => {
     db.get("users").push(user).write();
     res.json({ msg: "Registered", user });
   } catch (err) {
-    console.error(`❌ Registration Error: ${err.message}`);
-    res.status(500).json({ msg: "Error registering", error: err.message });
+    console.error(`❌ Registration Error: ${err.stack}`);
+    res.status(500).json({ 
+      msg: "Error registering", 
+      error: err.message,
+      stack: process.env.NODE_ENV === "development" ? err.stack : undefined
+    });
   }
 };
 
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(`🔑 Login attempt for: ${email}`);
+    console.log(`🔑 Login attempt: ${email}`);
+    
+    // 🕒 Tiny delay to prevent resource contention
+    await new Promise(resolve => setTimeout(resolve, 150));
     
     const user = db.get("users").find({ email }).value();
     if (!user) {
@@ -66,11 +76,11 @@ exports.login = async (req, res) => {
       user: { ...user, _id: user.id, id: user.id } 
     });
   } catch (err) {
-    console.error("❌ CRITICAL AUTH ERROR:", err.stack);
+    console.error(`❌ Login Error: ${err.stack}`);
     res.status(500).json({ 
       msg: "Error logging in", 
       error: err.message,
-      stack: process.env.NODE_ENV === "development" ? err.stack : undefined 
+      stack: process.env.NODE_ENV === "development" ? err.stack : undefined
     });
   }
 };

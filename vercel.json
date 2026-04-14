@@ -15,6 +15,10 @@
       "destination": "https://quickbites-backend-738z.onrender.com/api/$1"
     },
     {
+      "source": "/api",
+      "destination": "https://quickbites-backend-738z.onrender.com/api"
+    },
+    {
       "source": "/(.*)",
       "destination": "/client/$1"
     }

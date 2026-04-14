@@ -343,8 +343,8 @@ export default function HomePage() {
                     </div>
                     
                     {/* Rating Badge */}
-                    <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[13px] font-black text-[#1C1C1C] flex items-center shadow-lg border border-black/5">
-                       4.5 <Star className="w-3.5 h-3.5 ml-1 fill-yellow-400 text-yellow-400" />
+                    <div className="absolute bottom-4 left-4 bg-white/20 backdrop-blur-xl border border-white/30 px-3 py-1.5 rounded-full text-[13px] font-black text-white flex items-center shadow-2xl">
+                       4.5 <Star className="w-3.5 h-3.5 ml-1 fill-[var(--brand-orange)] text-[var(--brand-orange)]" />
                     </div>
                   </div>
 
