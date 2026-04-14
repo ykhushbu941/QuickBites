@@ -12,7 +12,7 @@ import {
   CheckCircle2,
   Lock
 } from "lucide-react";
-import axios from "axios";
+import API from "../api/api";
 
 export default function EditProfilePage() {
   const { user, fetchUser } = useContext(AuthContext);

@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import axios from "axios";
+import API from "../api/api";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { Eye, EyeOff, User, Mail, Lock, Phone, MapPin, ChefHat, UtensilsCrossed } from "lucide-react";
@@ -20,10 +20,10 @@ export default function Register() {
     setLoading(true);
     console.log("Registering with payload:", user);
     try {
-      await axios.post("/api/auth/user/register", user);
+      await API.post("/auth/user/register", user);
       
       console.log("Registration successful, logging in...");
-      const res = await axios.post("/api/auth/user/login", { email: user.email, password: user.password });
+      const res = await API.post("/auth/user/login", { email: user.email, password: user.password });
       console.log("Login res:", res.data);
       
       login(res.data.token, res.data.role, res.data.user);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../api/api";
 import { 
   ArrowLeft, 
   ChefHat, 
@@ -25,7 +25,7 @@ export default function TrackOrderPage() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await axios.get(`/api/orders/${orderId}`);
+        const res = await API.get(`/orders/${orderId}`);
         setOrder(res.data);
       } catch (err) {
         console.error("Failed to fetch order");
@@ -43,7 +43,7 @@ export default function TrackOrderPage() {
   const handleCancelOrder = async () => {
     if (!window.confirm("Are you sure you want to cancel this order?")) return;
     try {
-      const res = await axios.put(`/api/orders/${orderId}/cancel`);
+      const res = await API.put(`/orders/${orderId}/cancel`);
       setOrder(res.data);
     } catch (err) {
       alert(err.response?.data?.msg || "Failed to cancel order");

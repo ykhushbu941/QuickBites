@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../api/api";
 import { Package, Clock, CheckCircle, Truck, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -13,7 +13,7 @@ export default function PartnerDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("/api/orders/partner");
+      const res = await API.get("/orders/partner");
       setOrders(res.data);
     } catch (err) {
       console.error("Failed to fetch partner orders", err);
@@ -24,7 +24,7 @@ export default function PartnerDashboard() {
 
   const updateStatus = async (orderId, newStatus) => {
     try {
-      const res = await axios.put(`/api/orders/${orderId}/status`, { status: newStatus });
+      const res = await API.put(`/orders/${orderId}/status`, { status: newStatus });
       setOrders(orders.map(o => o._id === orderId ? { ...o, status: res.data.status } : o));
     } catch (err) {
       alert("Failed to update status");

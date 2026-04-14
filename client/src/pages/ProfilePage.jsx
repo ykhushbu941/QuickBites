@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-import axios from "axios";
+import API from "../api/api";
 import { LogOut, Package, MapPin, Phone, Coffee, Settings, ChevronRight } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -14,7 +14,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("/api/orders");
+        const res = await API.get("/orders");
         setOrders(res.data);
       } catch (err) {
         console.error("Failed to fetch orders");
@@ -27,7 +27,7 @@ export default function ProfilePage() {
 
   const cancelOrder = async (orderId) => {
     try {
-      const res = await axios.put(`/api/orders/${orderId}/cancel`);
+      const res = await API.put(`/orders/${orderId}/cancel`);
       setOrders(orders.map(o => o._id === orderId ? { ...o, status: res.data.status } : o));
     } catch (err) {
       alert(err.response?.data?.msg || "Failed to cancel order");

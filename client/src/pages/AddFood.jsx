@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import API from "../api/api";
 import { useNavigate } from "react-router-dom";
 import { Video, Utensils, IndianRupee, FileText, Upload, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
@@ -20,7 +20,7 @@ export default function AddFood() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("/api/foods", food);
+      await API.post("/foods", food);
       alert("Reel and Food added successfully! 🎉");
       navigate("/reels");
     } catch (err) {
