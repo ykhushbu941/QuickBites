@@ -4,17 +4,19 @@ import { Heart, MessageCircle, Send, Plus, Store, X, CheckCircle, Bookmark, Play
 import { AuthContext } from "../context/AuthContext";
 import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ─────────────────────────────────────────────
 // Single Reel Card
 // ─────────────────────────────────────────────
-const Reel = ({ food, isActive, isNext }) => {
+const Reel = ({ food, isActive, isNext, index, activeIndex }) => {
   const videoRef = useRef(null);
   const { user, fetchUser } = useContext(AuthContext);
   const { addToCart } = useContext(CartContext);
   const navigate = useNavigate();
 
   const [isPaused, setIsPaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(false); // Default to unmuted as requested
   const [likesCount, setLikesCount] = useState(food.likes?.length || 0);
   const [isLiked, setIsLiked] = useState(false);
   const [showHeart, setShowHeart] = useState(false);
@@ -25,22 +27,29 @@ const Reel = ({ food, isActive, isNext }) => {
   const [toast, setToast] = useState(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
 
-  // Auto-play / pause based on active state (passed from parent observer)
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     if (isActive) {
-        // Must use muted for autoplay policies across most browsers (we added it in markup),
-        // catching the promise handles any blockages
-        video.play().catch(e => console.log("Autoplay blocked/failed", e));
-        setIsPaused(false);
+      // Only play automatically if the data is at least partially loaded to avoid A/V desync
+      video.muted = isMuted;
+      const playPromise = video.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          video.muted = true;
+          setIsMuted(true);
+          video.play().catch(() => {});
+        });
+      }
+      setIsPaused(false);
     } else {
-        video.pause();
-        video.currentTime = 0; // reset
-        setShowComments(false);
+      video.pause();
+      video.currentTime = 0;
+      setShowComments(false);
     }
-  }, [isActive]);
+  }, [isActive, food._id]);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -50,6 +59,12 @@ const Reel = ({ food, isActive, isNext }) => {
   const handleTap = () => {
     const video = videoRef.current;
     if (!video) return;
+    // First tap unmutes; subsequent taps pause/play
+    if (isMuted) {
+      video.muted = false;
+      setIsMuted(false);
+      return;
+    }
     if (video.paused) {
       video.play().catch(() => {});
       setIsPaused(false);
@@ -63,7 +78,6 @@ const Reel = ({ food, isActive, isNext }) => {
   const handleSingleOrDoubleTap = (e) => {
     e.preventDefault();
     if (tapTimer.current) {
-      // double tap
       clearTimeout(tapTimer.current);
       tapTimer.current = null;
       if (!isLiked) toggleLike();
@@ -128,34 +142,68 @@ const Reel = ({ food, isActive, isNext }) => {
     }
   };
 
-  return (
-    <div className="relative w-full h-[calc(100vh-0px)] sm:h-full max-w-[430px] mx-auto snap-center bg-black flex flex-col justify-center overflow-hidden flex-shrink-0 group">
-      
-      {/* ── Toast ── */}
-      {toast && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-[var(--glass-bg)] backdrop-blur-md text-[var(--text-primary)] px-4 py-2 rounded-full flex items-center space-x-2 border border-[var(--border-color)] animate-fade-in shadow-lg">
-          <CheckCircle className="w-4 h-4 text-[var(--brand-orange)] flex-shrink-0" />
-          <span className="text-sm font-semibold whitespace-nowrap">{toast}</span>
-        </div>
-      )}
+  // videoUrl is now a local path like /videos/reel1.mp4
 
-      {/* ── VIDEO CONTAINER (Forced Mobile Ratio via CSS) ── */}
-      <div className="absolute inset-0 bg-[var(--bg-primary)] flex items-center justify-center">
+  return (
+    <div className="relative w-full h-[100dvh] sm:h-[95vh] max-w-[400px] mx-auto snap-center bg-black flex flex-col justify-center overflow-hidden flex-shrink-0 group shadow-[0_20px_100px_rgba(0,0,0,0.8)] border-x border-white/10 ring-1 ring-white/5">
+      
+      <AnimatePresence>
+        {toast && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: -20, x: "-50%" }}
+            className="absolute top-16 left-1/2 z-50 bg-[var(--glass-bg)] backdrop-blur-md text-[var(--text-primary)] px-4 py-2 rounded-full flex items-center space-x-2 border border-[var(--border-color)] shadow-lg"
+          >
+            <CheckCircle className="w-4 h-4 text-[var(--brand-orange)] flex-shrink-0" />
+            <span className="text-sm font-semibold whitespace-nowrap">{toast}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="absolute inset-0 bg-black flex items-center justify-center overflow-hidden">
           <video
             ref={videoRef}
             src={food.videoUrl}
             loop
-            muted // Muted required for auto-play policy on most devices initially
+            muted={isMuted}
             playsInline
-            // OPTIMIZATION: Predictive preloading for active and next reel
-            preload={(isActive || isNext) ? "auto" : "metadata"}
-            className="w-full h-full object-cover sm:rounded-none" // object-cover forces the horizontal web videos acting as vertical to crop
-            onCanPlay={() => setVideoLoaded(true)}
+            autoPlay
+            poster={food.imageUrl}
+            preload={(isActive || (index > activeIndex && index <= activeIndex + 2)) ? "auto" : "metadata"}
+            className="w-full h-full object-cover"
+            onLoadedData={e => {
+              setVideoLoaded(true);
+              if (isActive) {
+                // play unmuted if possible
+                e.target.muted = isMuted;
+                e.target.play().catch(() => {
+                    e.target.muted = true;
+                    setIsMuted(true);
+                    e.target.play().catch(() => {});
+                });
+              }
+            }}
             onClick={handleSingleOrDoubleTap}
           />
       </div>
 
-      {/* Loading / poster image shown ONLY before video loads */}
+      {/* Strong cinematic gradient at bottom so text is always readable */}
+      <div className="absolute inset-0 pointer-events-none z-10" style={{background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 35%, transparent 60%)'}} />
+
+      {/* Mute indicator */}
+      {isMuted && isActive && videoLoaded && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 bg-black/60 backdrop-blur-sm rounded-full px-5 py-3 flex items-center space-x-2 pointer-events-none border border-white/10"
+        >
+          <span className="text-white text-xl">🔇</span>
+          <span className="text-white text-sm font-bold">Tap to unmute</span>
+        </motion.div>
+      )}
+
       {!videoLoaded && food.imageUrl && (
         <img
           src={food.imageUrl}
@@ -169,113 +217,126 @@ const Reel = ({ food, isActive, isNext }) => {
         </div>
       )}
 
-      {/* Pause overlay */}
       {isPaused && videoLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <div className="bg-[var(--glass-bg)] rounded-full p-6 backdrop-blur-sm animate-fade-in border border-[var(--border-color)]">
+        <motion.div 
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
+        >
+          <div className="bg-[var(--glass-bg)] rounded-full p-6 backdrop-blur-sm border border-[var(--border-color)]">
             <Play className="w-14 h-14 text-[var(--brand-orange)] fill-[var(--brand-orange)] ml-2" />
           </div>
-        </div>
+        </motion.div>
       )}
 
-      {/* Double-tap heart */}
       {showHeart && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20">
           <Heart fill="#FC8019" className="w-32 h-32 text-[#FC8019] opacity-90 animate-like-pump drop-shadow-2xl" />
         </div>
       )}
 
-      {/* Gradient overlays for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)]/90 via-[var(--bg-primary)]/20 to-transparent pointer-events-none" />
 
-      {/* ── Bottom Info ── */}
-      {/* Changed bottom padding to avoid nav overlap (bottom-24 instead of bottom-6) */}
-      <div className="absolute bottom-24 left-4 right-16 z-20 pointer-events-auto" onClick={e => e.stopPropagation()}>
-        
-        {/* Badges */}
-        <div className="flex items-center space-x-2 mb-3">
-          <div className={`w-5 h-5 rounded-sm border-[1.5px] flex items-center justify-center ${food.isVeg ? "border-[#3D9970] bg-[#3D9970]/10" : "border-[#E23744] bg-[#E23744]/10"}`}>
-            <div className={`w-2.5 h-2.5 rounded-full ${food.isVeg ? "bg-[#3D9970]" : "bg-[#E23744]"}`} />
+
+
+      {/* ── Bottom Info (Instagram-style — pushed to very bottom) ── */}
+      <motion.div 
+        animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ delay: 0.15, type: 'spring', stiffness: 120, damping: 20 }}
+        className="absolute bottom-20 left-4 right-20 z-20 pointer-events-auto" 
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Restaurant + cuisine tags */}
+        <div className="flex items-center space-x-2 mb-2">
+          <div className={`w-4 h-4 rounded-sm border-[1.5px] flex items-center justify-center flex-shrink-0 ${food.isVeg ? "border-[#3D9970]" : "border-[#E23744]"}`}>
+            <div className={`w-2 h-2 rounded-full ${food.isVeg ? "bg-[#3D9970]" : "bg-[#E23744]"}`} />
           </div>
+          <button
+            onClick={() => navigate(`/home?search=${encodeURIComponent(food.restaurant)}`)}
+            className="flex items-center space-x-1 text-white/90 text-[12px] font-bold hover:underline"
+          >
+            <Store className="w-3 h-3 text-[var(--brand-orange)]" />
+            <span>{food.restaurant}</span>
+          </button>
           {food.cuisine && food.cuisine !== "Other" && (
-            <span className="text-[10px] uppercase font-extrabold tracking-wider bg-white/20 backdrop-blur-md px-2 py-1 rounded text-white shadow-sm">
+            <span className="text-[10px] uppercase font-bold tracking-wider bg-white/15 backdrop-blur-md px-2 py-0.5 rounded-full text-white/80">
               {food.cuisine}
             </span>
           )}
         </div>
 
-        <h2 className="text-[22px] font-extrabold text-[var(--text-primary)] mb-1 drop-shadow-md leading-tight">{food.name}</h2>
+        {/* Food name */}
+        <h2 className="text-[20px] font-black text-white mb-1.5 drop-shadow-lg leading-tight">{food.name}</h2>
 
-        {/* Restaurant */}
-        <button
-          onClick={() => navigate(`/home?search=${encodeURIComponent(food.restaurant)}`)}
-          className="flex items-center space-x-1 text-[var(--text-primary)]/90 bg-[var(--bg-surface)] border border-[var(--border-color)] backdrop-blur-md px-2.5 py-1 rounded-md text-[11px] mb-3 hover:bg-[var(--bg-surface)]/80 transition-colors"
-        >
-          <Store className="w-3.5 h-3.5 text-[var(--brand-orange)]" />
-          <span className="font-bold">{food.restaurant}</span>
-        </button>
-
-        <p className="text-[13px] text-[var(--text-secondary)] line-clamp-2 mb-4 font-medium max-w-[90%]">
-            {food.description || "Fresh and delicious food made with love."}
+        {/* Description */}
+        <p className="text-[12px] text-white/70 line-clamp-1 mb-3 font-medium">
+          {food.description || "Fresh and delicious. Made with love."}
         </p>
 
+        {/* Price + Add button */}
         <div className="flex items-center space-x-3">
-          <span className="text-xl font-black text-[var(--text-primary)] drop-shadow-md">
-            ₹{food.price}
-          </span>
-          <button
+          <span className="text-[22px] font-black text-white drop-shadow-lg">₹{food.price}</span>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleOrder}
-            className="bg-[var(--brand-orange)] text-white text-[13px] font-bold px-6 py-2.5 rounded-xl flex items-center space-x-1.5 shadow-lg shadow-orange-500/30 active:scale-95 transition-all"
+            className="bg-[var(--brand-orange)] text-white text-[13px] font-black px-7 py-2.5 rounded-2xl flex items-center space-x-1.5 shadow-xl shadow-orange-500/40 uppercase tracking-widest"
           >
             <Plus className="w-4 h-4" strokeWidth={3} />
             <span>ADD</span>
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* ── Right Action Bar ── */}
-      <div className="absolute right-3 bottom-24 flex flex-col items-center space-y-4 z-20 pb-2">
-        {/* Profile mock icon */}
+      {/* ── Right Action Bar (Instagram-style — anchored to bottom right) ── */}
+      <motion.div 
+        animate={isActive ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+        transition={{ delay: 0.2, type: 'spring', stiffness: 120, damping: 20 }}
+        className="absolute right-3 bottom-20 flex flex-col items-center space-y-5 z-20"
+      >
         <button 
              onClick={() => navigate(`/home?search=${encodeURIComponent(food.restaurant)}`)}
              className="relative mb-2 shrink-0 group active:scale-95 transition-transform"
         >
              <div className="w-11 h-11 rounded-full border-2 border-white overflow-hidden bg-[#2A2A2A] shadow-lg">
-                 {food.imageUrl ? <img src={food.imageUrl} className="w-full h-full object-cover" alt="creator" /> : <div className="bg-white" />}
+                 {food.restaurantImageUrl ? <img src={food.restaurantImageUrl} className="w-full h-full object-cover" alt="restaurant" /> : <div className="bg-white" />}
              </div>
-             <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-[var(--brand-orange)] rounded-full w-4 h-4 flex items-center justify-center border border-white">
+             <motion.div 
+                initial={false}
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-[var(--brand-orange)] rounded-full w-4 h-4 flex items-center justify-center border border-white"
+             >
                  <Plus className="w-3 h-3 text-white" />
-             </div>
+             </motion.div>
         </button>
 
-        {/* Like */}
         <button onClick={toggleLike} className="flex flex-col items-center group">
           <Heart className={`w-8 h-8 transition-all drop-shadow-lg ${isLiked ? "text-[#E23744] fill-[#E23744] scale-110" : "text-[var(--text-primary)]"}`} />
           <span className="text-[var(--text-primary)] text-[11px] font-bold mt-1 drop-shadow-md">{likesCount}</span>
         </button>
 
-        {/* Comments */}
         <button onClick={() => setShowComments(v => !v)} className="flex flex-col items-center group">
           <MessageCircle className="w-8 h-8 text-[var(--text-primary)] drop-shadow-lg" />
           <span className="text-[var(--text-primary)] text-[11px] font-bold mt-1 drop-shadow-md">{comments.length}</span>
         </button>
 
-        {/* Save */}
         <button onClick={toggleSave} className="flex flex-col items-center group">
           <Bookmark className={`w-7 h-7 transition-all drop-shadow-lg ${isSaved ? "text-yellow-400 fill-yellow-400" : "text-[var(--text-primary)]"}`} />
           <span className="text-[var(--text-primary)] text-[11px] font-bold mt-1 drop-shadow-md">Save</span>
         </button>
 
-        {/* Share */}
         <button onClick={handleShare} className="flex flex-col items-center group">
           <Send className="w-7 h-7 text-[var(--text-primary)] drop-shadow-lg transform -rotate-12" />
           <span className="text-[var(--text-primary)] text-[11px] font-bold mt-1 drop-shadow-md">Share</span>
         </button>
-      </div>
+      </motion.div>
 
       {/* ── Comments Panel ── */}
-      <div 
-         className={`absolute bottom-0 w-full bg-[var(--bg-surface)] rounded-t-3xl border-t border-[var(--border-color)] z-30 flex flex-col shadow-2xl transition-transform duration-300 ease-in-out ${showComments ? 'translate-y-0 h-[65%]' : 'translate-y-full h-0'}`}
+      <motion.div 
+         initial={false}
+         animate={{ y: showComments ? 0 : "100%", height: showComments ? "65%" : "0%" }}
+         transition={{ type: "spring", damping: 25, stiffness: 200 }}
+         className="absolute bottom-0 w-full bg-[var(--bg-surface)] rounded-t-3xl border-t border-[var(--border-color)] z-30 flex flex-col shadow-2xl overflow-hidden"
          onClick={e => e.stopPropagation()}
       >
         {showComments && (
@@ -295,7 +356,12 @@ const Reel = ({ food, isActive, isNext }) => {
               </div>
             ) : (
               comments.map((c, i) => (
-                <div key={i} className="flex space-x-3">
+                <motion.div 
+                    key={i} 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex space-x-3"
+                >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[var(--brand-orange)] to-[#E23744] flex-shrink-0 flex items-center justify-center text-xs font-bold text-white shadow-md">
                     {(c.user?.name || "U").charAt(0).toUpperCase()}
                   </div>
@@ -305,7 +371,7 @@ const Reel = ({ food, isActive, isNext }) => {
                       {c.text}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               ))
             )}
           </div>
@@ -327,12 +393,11 @@ const Reel = ({ food, isActive, isNext }) => {
           </form>
           </>
         )}
-      </div>
+      </motion.div>
 
     </div>
   );
 };
-
 
 // ─────────────────────────────────────────────
 // Reels Page Container
@@ -349,10 +414,20 @@ export default function ReelsPage() {
     fetchFoods();
   }, []);
 
+  // Instant Reset on Filter Change
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo(0, 0);
+      setActiveIndex(0);
+    }
+  }, [filter]);
+
   const fetchFoods = async () => {
     try {
       const res = await axios.get("/api/foods?limit=40");
-      setFoods(res.data);
+      // Shuffle reels for fresh experience
+      const shuffled = res.data.sort(() => Math.random() - 0.5);
+      setFoods(shuffled);
     } catch {
       console.error("Error loading foods");
     } finally {
@@ -360,21 +435,19 @@ export default function ReelsPage() {
     }
   };
 
-  // Setup Intersection Observer to detect which reel is active
   useEffect(() => {
     if (loading || foods.length === 0 || !containerRef.current) return;
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if(entry.isIntersecting) {
-                // Determine index via DOM child position
                 const index = Array.from(containerRef.current.children).indexOf(entry.target);
                 setActiveIndex(index);
             }
         });
     }, {
         root: containerRef.current,
-        threshold: 0.7 // TRIGGER FASTER: When 70% is visible
+        threshold: 0.7 
     });
 
     const elements = containerRef.current.children;
@@ -394,42 +467,47 @@ export default function ReelsPage() {
     );
   }
 
-  const filteredFoods = foods.filter(food => {
+  const filteredFoods = (foods || []).filter(food => {
       if (filter === "veg") return food.isVeg;
       if (filter === "nonveg") return !food.isVeg;
       return true;
   });
 
   return (
-    // The container forces background to follow the theme
-    // snap-container setup exists in global css
     <div className="bg-[var(--bg-primary)] w-full fixed inset-0 z-10 overflow-hidden transition-colors duration-300">
       
       {/* Top Filter Overlay */}
-      <div className="absolute top-12 md:top-20 left-0 right-0 z-50 flex justify-center items-center">
-          <div className="flex items-center space-x-2 bg-[var(--glass-bg)] backdrop-blur-xl px-2 py-1.5 rounded-[2rem] border border-[var(--border-color)] shadow-xl">
+      <motion.div 
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="absolute top-12 md:top-16 left-0 right-0 z-50 flex justify-center items-center pointer-events-none"
+      >
+          <div className="flex items-center space-x-8 pointer-events-auto">
               <button 
                 onClick={() => setFilter("all")} 
-                className={`text-[13px] font-black uppercase tracking-widest px-6 py-2 rounded-full transition-all duration-300 ${filter === "all" ? "bg-[var(--text-primary)] text-[var(--bg-primary)] shadow-xl" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
+                className={`text-[15px] font-black tracking-wide transition-all duration-300 drop-shadow-lg relative ${filter === "all" ? "text-white scale-110" : "text-white/60 hover:text-white"}`}
               >
                 For You
+                {filter === "all" && <div className="h-0.5 bg-white w-full rounded-full mt-0.5" />}
               </button>
               
               <button 
                 onClick={() => setFilter("veg")} 
-                className={`text-[13px] font-black uppercase tracking-widest px-6 py-2 rounded-full flex items-center transition-all duration-300 ${filter === "veg" ? "bg-[#3D9970] text-white shadow-xl shadow-[#3D9970]/20" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
+                className={`text-[15px] font-black tracking-wide transition-all duration-300 drop-shadow-lg relative ${filter === "veg" ? "text-white scale-110" : "text-white/60 hover:text-white"}`}
               >
                 Veg
+                {filter === "veg" && <div className="h-0.5 bg-white w-full rounded-full mt-0.5" />}
               </button>
               
               <button 
                 onClick={() => setFilter("nonveg")} 
-                className={`text-[13px] font-black uppercase tracking-widest px-6 py-2 rounded-full flex items-center transition-all duration-300 ${filter === "nonveg" ? "bg-[#E23744] text-white shadow-xl shadow-[#E23744]/20" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
+                className={`text-[15px] font-black tracking-wide transition-all duration-300 drop-shadow-lg relative ${filter === "nonveg" ? "text-white scale-110" : "text-white/60 hover:text-white"}`}
               >
                 Non-Veg
+                {filter === "nonveg" && <div className="h-0.5 bg-white w-full rounded-full mt-0.5" />}
               </button>
           </div>
-      </div>
+      </motion.div>
 
       <div 
          ref={containerRef}
@@ -449,7 +527,9 @@ export default function ReelsPage() {
               key={food._id} 
               food={food} 
               isActive={index === activeIndex} 
-              isNext={index === activeIndex + 1} // PREDICTIVE: true for the next card
+              isNext={index === activeIndex + 1} 
+              index={index}
+              activeIndex={activeIndex}
             />
           ))
         )}

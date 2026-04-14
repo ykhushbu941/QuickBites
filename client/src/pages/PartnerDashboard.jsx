@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Package, Clock, CheckCircle, Truck, ExternalLink } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function PartnerDashboard() {
   const [orders, setOrders] = useState([]);
@@ -33,7 +34,9 @@ export default function PartnerDashboard() {
   const StatusButton = ({ order, status, icon: Icon, label, colorClass }) => {
     const isActive = order.status === status;
     return (
-      <button 
+      <motion.button 
+        whileHover={!isActive && order.status !== "Cancelled" ? { scale: 1.05 } : {}}
+        whileTap={!isActive && order.status !== "Cancelled" ? { scale: 0.95 } : {}}
         onClick={() => updateStatus(order._id, status)}
         disabled={isActive || order.status === "Cancelled"}
         className={`flex-1 flex flex-col items-center justify-center p-2 rounded-xl text-xs font-semibold transition-all ${
@@ -44,33 +47,72 @@ export default function PartnerDashboard() {
       >
         <Icon className="w-5 h-5 mb-1" />
         {label}
-      </button>
+      </motion.button>
     );
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemFadeUp = {
+    hidden: { opacity: 0, y: 30, scale: 0.95 },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { type: "spring", stiffness: 100, damping: 15 }
+    }
   };
 
   return (
     <div className="max-w-md md:max-w-6xl mx-auto min-h-screen px-4 py-8 pb-24 bg-[var(--bg-primary)] transition-colors duration-300">
-      <div className="mb-6">
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="mb-6"
+      >
         <h1 className="text-2xl font-black text-[var(--text-primary)] mb-1">Partner Dashboard</h1>
         <p className="text-[var(--brand-orange)] text-sm font-black uppercase tracking-widest">Manage incoming orders</p>
-      </div>
+      </motion.div>
 
       {loading ? (
         <div className="space-y-4 animate-pulse">
            {[1,2,3].map(i => <div key={i} className="h-40 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)]"></div>)}
         </div>
       ) : orders.length === 0 ? (
-        <div className="bg-[var(--bg-surface)] p-12 text-center rounded-[2.5rem] border border-[var(--border-color)] shadow-xl mt-12">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-[var(--bg-surface)] p-12 text-center rounded-[2.5rem] border border-[var(--border-color)] shadow-xl mt-12"
+        >
            <Package className="w-16 h-16 text-[var(--brand-orange)]/50 mx-auto mb-4" />
            <h2 className="text-xl font-black text-[var(--text-primary)] mb-2">No active orders</h2>
            <p className="text-[var(--text-secondary)] text-sm font-medium">When users order your dishes, they will appear here for you to manage.</p>
-        </div>
+        </motion.div>
       ) : (
-        <div className="space-y-5 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+        <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: false, amount: 0.1 }}
+            className="space-y-5 md:space-y-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6"
+        >
           {orders.map((order) => (
-            <div key={order._id} className={`bg-[var(--bg-surface)] p-5 rounded-[2rem] border-l-[6px] h-full flex flex-col justify-between shadow-xl shadow-black/[0.02] border border-[var(--border-color)] transition-all ${
-              order.status === 'Cancelled' ? 'border-l-red-500 bg-red-500/[0.03] opacity-75' : 'border-l-[var(--brand-orange)]'
-            }`}>
+            <motion.div 
+              key={order._id} 
+              variants={itemFadeUp}
+              layout
+              className={`bg-[var(--bg-surface)] p-5 rounded-[2rem] border-l-[6px] h-full flex flex-col justify-between shadow-xl shadow-black/[0.02] border border-[var(--border-color)] transition-all ${
+                order.status === 'Cancelled' ? 'border-l-red-500 bg-red-500/[0.03] opacity-75' : 'border-l-[var(--brand-orange)]'
+              }`}
+            >
               {/* Header */}
               <div className="flex justify-between items-start mb-4 pb-3 border-b border-[var(--border-color)]">
                 <div>
@@ -117,9 +159,9 @@ export default function PartnerDashboard() {
                    Order Cancelled
                 </div>
               )}
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   );

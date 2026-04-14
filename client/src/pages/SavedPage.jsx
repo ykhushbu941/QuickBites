@@ -3,6 +3,7 @@ import axios from "axios";
 import { CartContext } from "../context/CartContext";
 import { Bookmark, Plus, ArrowLeft, Video } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export default function SavedPage() {
   const [foods, setFoods] = useState([]);
@@ -35,13 +36,42 @@ export default function SavedPage() {
     }
   };
 
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardFadeUp = {
+    hidden: { opacity: 0, y: 30, scale: 0.95 },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { type: "spring", stiffness: 100, damping: 15 }
+    }
+  };
+
   return (
     <div className="max-w-md md:max-w-7xl mx-auto min-h-screen px-4 py-8 pt-20 bg-[var(--bg-primary)] transition-colors duration-300">
-      <div className="flex items-center justify-between mb-8">
+      <motion.div 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="flex items-center justify-between mb-8"
+      >
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 rounded-2xl bg-[var(--brand-orange)]/10 flex items-center justify-center">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, delay: 0.2 }}
+            className="w-12 h-12 rounded-2xl bg-[var(--brand-orange)]/10 flex items-center justify-center"
+          >
             <Bookmark className="w-6 h-6 text-[var(--brand-orange)]" fill="currentColor" />
-          </div>
+          </motion.div>
           <div>
             <h1 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter">Saved Reels</h1>
             <p className="text-[var(--text-secondary)] text-[10px] font-black uppercase tracking-widest">Your collection</p>
@@ -50,7 +80,7 @@ export default function SavedPage() {
         <button onClick={() => navigate(-1)} className="p-3 bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-color)] text-[var(--text-primary)] hover:scale-110 active:scale-95 transition-all shadow-sm">
             <ArrowLeft className="w-6 h-6" />
         </button>
-      </div>
+      </motion.div>
 
       <div className="pb-24">
         {loading ? (
@@ -60,19 +90,30 @@ export default function SavedPage() {
             ))}
           </div>
         ) : foods.length === 0 ? (
-          <div className="text-center mt-20 flex flex-col items-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mt-20 flex flex-col items-center"
+          >
             <div className="w-24 h-24 rounded-full bg-[var(--bg-surface)] flex items-center justify-center mb-6 shadow-inner">
                <Bookmark className="w-10 h-10 text-[var(--text-secondary)]/30" />
             </div>
             <p className="text-[var(--text-primary)] font-black text-xl tracking-tight">Your bookmarks are empty</p>
             <p className="text-[var(--text-secondary)] text-sm mt-2 max-w-xs mx-auto">Explore reels and save your favorite dishes to find them later!</p>
             <Link to="/reels" className="mt-8 bg-[var(--brand-orange)] text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-95 transition-all">Explore Reels</Link>
-          </div>
+          </motion.div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: false, amount: 0.1 }}
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+          >
             {foods.map(food => (
-              <div 
+              <motion.div 
                 key={food._id} 
+                variants={cardFadeUp}
                 onClick={() => navigate(`/home?search=${encodeURIComponent(food.name)}`)}
                 className="bg-[var(--bg-surface)] overflow-hidden rounded-[2rem] flex flex-col group cursor-pointer border border-[var(--border-color)] hover:border-[var(--brand-orange)]/30 hover:shadow-2xl hover:shadow-orange-500/5 transition-all duration-500"
               >
@@ -114,9 +155,9 @@ export default function SavedPage() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

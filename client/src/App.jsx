@@ -1,6 +1,8 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
+import { AnimatePresence, motion } from "framer-motion";
+import PageTransition from "./components/PageTransition";
 
 // Pages
 import Login from "./pages/Login";
@@ -54,114 +56,139 @@ function PartnerRoute({ children }) {
 }
 
 export default function App() {
+  const location = useLocation();
   return (
     <ThemeProvider>
-      <div className="bg-[var(--bg-primary)] min-h-screen font-sans antialiased text-[var(--text-primary)] pb-32 pt-14 relative transition-colors duration-300">
+      <div className="bg-[var(--bg-primary)] min-h-screen font-sans antialiased text-[var(--text-primary)] pb-32 pt-14 relative transition-colors duration-300 overflow-x-hidden">
+        {/* Global Background Elements */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+          <motion.div 
+            animate={{ 
+              x: [0, 100, 0],
+              y: [0, 50, 0],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[var(--brand-orange)]/5 blur-[100px] rounded-full"
+          />
+          <motion.div 
+            animate={{ 
+              x: [0, -100, 0],
+              y: [0, -50, 0],
+              scale: [1, 1.3, 1]
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[var(--brand-yellow)]/5 blur-[120px] rounded-full"
+          />
+        </div>
+
         <TopBar />
 
-      <Routes>
-        {/* Splash / Landing */}
-        <Route path="/" element={<LandingPage />} />
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          {/* Splash / Landing */}
+          <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
 
-        {/* Auth Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+          {/* Auth Routes */}
+          <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+          <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
 
-        {/* Core App Routes */}
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/reels"
-          element={
-            <ProtectedRoute>
-              <ReelsPage />
-            </ProtectedRoute>
-          }
-        />
+          {/* Core App Routes */}
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <PageTransition><HomePage /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/reels"
+            element={
+              <ProtectedRoute>
+                <PageTransition><ReelsPage /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/cart"
-          element={
-            <ProtectedRoute>
-              <CartPage />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <PageTransition><CartPage /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/saved"
-          element={
-            <ProtectedRoute>
-              <SavedPage />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/saved"
+            element={
+              <ProtectedRoute>
+                <PageTransition><SavedPage /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <PageTransition><ProfilePage /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/edit-profile"
-          element={
-            <ProtectedRoute>
-              <EditProfilePage />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/edit-profile"
+            element={
+              <ProtectedRoute>
+                <PageTransition><EditProfilePage /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/payment"
-          element={
-            <ProtectedRoute>
-              <PaymentPage />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/payment"
+            element={
+              <ProtectedRoute>
+                <PageTransition><PaymentPage /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/track-order/:orderId"
-          element={
-            <ProtectedRoute>
-              <TrackOrderPage />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/track-order/:orderId"
+            element={
+              <ProtectedRoute>
+                <PageTransition><TrackOrderPage /></PageTransition>
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Partner Routing */}
-        <Route
-          path="/add"
-          element={
-            <PartnerRoute>
-              <AddFood />
-            </PartnerRoute>
-          }
-        />
-        
-        <Route
-          path="/dashboard"
-          element={
-            <PartnerRoute>
-              <PartnerDashboard />
-            </PartnerRoute>
-          }
-        />
+          {/* Partner Routing */}
+          <Route
+            path="/add"
+            element={
+              <PartnerRoute>
+                <PageTransition><AddFood /></PageTransition>
+              </PartnerRoute>
+            }
+          />
+          
+          <Route
+            path="/dashboard"
+            element={
+              <PartnerRoute>
+                <PageTransition><PartnerDashboard /></PageTransition>
+              </PartnerRoute>
+            }
+          />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/home" />} />
-      </Routes>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/home" />} />
+        </Routes>
+      </AnimatePresence>
 
       <BottomNavigation />
       </div>

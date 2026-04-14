@@ -33,115 +33,406 @@ mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/reelbite")
   // Clear existing foods to start fresh with vertical reels
   await Food.deleteMany({});
 
-  // 🎥 Real public domain / CDN food vertical reels (9:16 aspect ratio tested)
-  // Many web MP4 sources are horizontal, these represent proper reels
-  const VIDEOS = [
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-    "https://samplelib.com/lib/preview/mp4/sample-15s.mp4",
-    "https://samplelib.com/lib/preview/mp4/sample-10s.mp4",
-    "https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4",
-    "https://www.w3schools.com/html/mov_bbb.mp4",
-    "https://media.w3.org/2010/05/sintel/trailer.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-  ];
-
-  /* 
-   Notes on Videos:
-   For production ReelBite, these would be user-uploaded vertical MP4s.
-   We use `object-cover` in ReelsPage to force these horizontals to fill a 9:16 vertical phone screen.
-  */
+  // 🎥 Pure Instagram Reels (provided by you)
+  // We use CSS cropping in the frontend to show "just the video"
 
   const sampleFoods = [
-    // --- INDIAN ---
-    { name: "Tandoori Butter Chicken", videoUrl: VIDEOS[0], imageUrl: "https://images.unsplash.com/photo-1603894527134-933390f7015a?q=80&w=800&auto=format&fit=crop", price: 280, restaurant: "Punjabi Dhaba", category: "Other", cuisine: "Indian", isVeg: false, description: "Creamy, rich tomato-based curry with tender smoky chicken pieces.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Paneer Tikka Platter", videoUrl: VIDEOS[1], imageUrl: "https://images.unsplash.com/photo-1567184109411-44bae8cd2720?q=80&w=800&auto=format&fit=crop", price: 240, restaurant: "Punjab Grill", category: "Other", cuisine: "Indian", isVeg: true, description: "Succulent paneer cubes grilled to perfection.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Hyderabadi Mutton Biryani", videoUrl: VIDEOS[2], imageUrl: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop", price: 380, restaurant: "Paradise Biryani", category: "Other", cuisine: "Indian", isVeg: false, description: "Authentic Hyderabadi mutton biryani with long grain basmati rice.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Dal Makhani Special", videoUrl: VIDEOS[3], imageUrl: "https://images.unsplash.com/photo-1626074353765-517a681e40be?q=80&w=800&auto=format&fit=crop", price: 180, restaurant: "Pind Balluchi", category: "Other", cuisine: "Indian", isVeg: true, description: "Slow-cooked black lentils with butter and cream.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Chole Bhature", videoUrl: VIDEOS[4], imageUrl: "https://images.unsplash.com/photo-1626500155551-03102c98031e?q=80&w=800&auto=format&fit=crop", price: 150, restaurant: "Sitaram Diwanchand", category: "Other", cuisine: "Indian", isVeg: true, description: "Spiced chickpeas served with fluffy deep-fried bread.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Rogan Josh", videoUrl: VIDEOS[5], imageUrl: "https://images.unsplash.com/photo-1542361345-89e58247f2d5?q=80&w=800&auto=format&fit=crop", price: 320, restaurant: "Khyber", category: "Other", cuisine: "Indian", isVeg: false, description: "Kashmiri style lamb curry with aromatic spices.", createdBy: partner._id, likes: [], comments: [] },
+    // --- 🇮🇳 INDIAN ---
+    { 
+      name: "Hyderabadi Dum Biryani", 
+      videoUrl: "/videos/reel3.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=200&auto=format&fit=crop",
+      price: 380, 
+      restaurant: "Biryani House", 
+      category: "Biryani", 
+      cuisine: "North Indian", 
+      isVeg: false, 
+      description: "Authentic slow-cooked basmati rice with tender marinated meat and aromatic spices.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Paneer Tikka Platter", 
+      videoUrl: "/videos/reel6.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1567188040759-fbcd18884932?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=200&auto=format&fit=crop",
+      price: 280, 
+      restaurant: "The Tandoor", 
+      category: "Starters", 
+      cuisine: "North Indian", 
+      isVeg: true, 
+      description: "Smoky, grilled paneer cubes marinated in a rich yogurt and spice mix.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Masala Dosa Classic", 
+      videoUrl: "/videos/reel9.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?q=80&w=200&auto=format&fit=crop",
+      price: 140, 
+      restaurant: "Dakshin Vibes", 
+      category: "Breakfast", 
+      cuisine: "South Indian", 
+      isVeg: true, 
+      description: "Crispy gold fermented crepe filled with spiced potato mash served with chutney.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Street Style Chaat", 
+      videoUrl: "/videos/reel3.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1601050638917-3d973df11059?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1526234362653-3b75a0c07438?q=80&w=200&auto=format&fit=crop",
+      price: 90, 
+      restaurant: "Chaat Corner", 
+      category: "Other", 
+      cuisine: "Indian", 
+      isVeg: true, 
+      description: "A burst of sweet, spicy, and tangy flavors in every bite.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Butter Chicken Mastery", 
+      videoUrl: "/videos/reel1.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1603894584115-f73f2ec04af0?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=200&auto=format&fit=crop",
+      price: 450, 
+      restaurant: "Punjab Express", 
+      category: "Main Course", 
+      cuisine: "North Indian", 
+      isVeg: false, 
+      description: "Creamy, velvety tomato gravy with succulent roasted chicken pieces.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
 
-    // --- SOUTH INDIAN ---
-    { name: "Crispy Masala Dosa", videoUrl: VIDEOS[6], imageUrl: "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?q=80&w=800&auto=format&fit=crop", price: 120, restaurant: "A2B Sweets", category: "Other", cuisine: "South Indian", isVeg: true, description: "Paper-thin golden dosa with spiced potato filling.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Medur Vada (2 Pcs)", videoUrl: VIDEOS[7], imageUrl: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop", price: 90, restaurant: "A2B Sweets", category: "Snacks", cuisine: "South Indian", isVeg: true, description: "Crispy fried lentil donuts served with sambar and coconut chutney.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Idli Sambar Platter", videoUrl: VIDEOS[8], imageUrl: "https://images.unsplash.com/photo-1589135339689-197027aa2f74?q=80&w=800&auto=format&fit=crop", price: 80, restaurant: "Saravana Bhavan", category: "Other", cuisine: "South Indian", isVeg: true, description: "Steamed rice cakes served with flavorful lentil soup.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Chicken 65", videoUrl: VIDEOS[9], imageUrl: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?q=80&w=800&auto=format&fit=crop", price: 210, restaurant: "Copper Chimney", category: "Snacks", cuisine: "South Indian", isVeg: false, description: "Spicy, deep-fried chicken pieces with curry leaves.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Onion Uttapam", videoUrl: VIDEOS[10], imageUrl: "https://images.unsplash.com/photo-1645177623570-520f3d45464a?q=80&w=800&auto=format&fit=crop", price: 110, restaurant: "A2B Sweets", category: "Other", cuisine: "South Indian", isVeg: true, description: "Thick savory pancake topped with finely chopped onions.", createdBy: partner._id, likes: [], comments: [] },
+    // --- 🇮🇹 ITALIAN ---
+    { 
+      name: "Truffle Mushroom Pizza", 
+      videoUrl: "/videos/reel1.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=200&auto=format&fit=crop",
+      price: 549, 
+      restaurant: "Artisan Oven", 
+      category: "Pizza", 
+      cuisine: "Italian", 
+      isVeg: true, 
+      description: "Wood-fired pizza topped with wild mushrooms and premium truffle oil.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Chicken Alfredo Pasta", 
+      videoUrl: "/videos/reel7.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1645112481335-502a1ed756da?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1493770348161-369560ae357d?q=80&w=200&auto=format&fit=crop",
+      price: 390, 
+      restaurant: "Pasta Bella", 
+      category: "Pasta", 
+      cuisine: "Italian", 
+      isVeg: false, 
+      description: "Fettuccine tossed in a rich, buttery parmesan cream sauce with grilled chicken.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Margherita Naples", 
+      videoUrl: "/videos/reel1.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1574071318508-1cdbad80ad38?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=200&auto=format&fit=crop",
+      price: 350, 
+      restaurant: "Pizzeria Uno", 
+      category: "Pizza", 
+      cuisine: "Italian", 
+      isVeg: true, 
+      description: "The classic with fresh mozzarella, basil, and San Marzano tomatoes.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
 
-    // --- PIZZA ---
-    { name: "Farmhouse Pizza", videoUrl: VIDEOS[11], imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=800&auto=format&fit=crop", price: 350, restaurant: "Pizza Hut", category: "Pizza", cuisine: "Italian", isVeg: true, description: "Tomato, capsicum, mushroom, and onion with extra cheese.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Pepperoni Passion", videoUrl: VIDEOS[0], imageUrl: "https://images.unsplash.com/photo-1628840042765-356cda07504e?q=80&w=800&auto=format&fit=crop", price: 450, restaurant: "Domino's", category: "Pizza", cuisine: "Italian", isVeg: false, description: "Classic pepperoni on a base of creamy mozzarella.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Margherita Classic", videoUrl: VIDEOS[1], imageUrl: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?q=80&w=800&auto=format&fit=crop", price: 280, restaurant: "Jamie's Italian", category: "Pizza", cuisine: "Italian", isVeg: true, description: "Simple and elegant with tomato sauce and basil.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "BBQ Chicken Pizza", videoUrl: VIDEOS[2], imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&auto=format&fit=crop", price: 420, restaurant: "La Pino'z", category: "Pizza", cuisine: "Italian", isVeg: false, description: "Smoky BBQ sauce chicken with caramelized onions.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Veggie Supreme", videoUrl: VIDEOS[3], imageUrl: "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?q=80&w=800&auto=format&fit=crop", price: 380, restaurant: "Pizza Express", category: "Pizza", cuisine: "Italian", isVeg: true, description: "Black olives, mushrooms, onions, and jalapenos.", createdBy: partner._id, likes: [], comments: [] },
+    // --- 🇯🇵 JAPANESE ---
+    { 
+      name: "Dragon Roll Sushi", 
+      videoUrl: "/videos/reel7.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1553621042-f6e147245754?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=200&auto=format&fit=crop",
+      price: 650, 
+      restaurant: "Sakura Zen", 
+      category: "Sushi", 
+      cuisine: "Japanese", 
+      isVeg: false, 
+      description: "Tempura shrimp roll topped with avocado and sweet eel sauce.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Spicy Miso Ramen", 
+      videoUrl: "/videos/reel5.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1544650039-22886fbb4323?q=80&w=200&auto=format&fit=crop",
+      price: 420, 
+      restaurant: "Ramen House", 
+      category: "Main Course", 
+      cuisine: "Japanese", 
+      isVeg: false, 
+      description: "Hearty broth with hand-pulled noodles, soft-boiled egg, and pork belly.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Veggie Gyoza", 
+      videoUrl: "/videos/reel7.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=200&auto=format&fit=crop",
+      price: 240, 
+      restaurant: "Tokyo Treats", 
+      category: "Starters", 
+      cuisine: "Japanese", 
+      isVeg: true, 
+      description: "Pan-fried dumplings filled with seasoned vegetables.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
 
-    // --- BURGER ---
-    { name: "Whopper Burger", videoUrl: VIDEOS[4], imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop", price: 220, restaurant: "Burger King", category: "Burger", cuisine: "American", isVeg: false, description: "Flame-grilled beef burger with signature toppings.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Double Cheese Burger", videoUrl: VIDEOS[5], imageUrl: "https://images.unsplash.com/photo-1571091718767-18b5c1457add?q=80&w=800&auto=format&fit=crop", price: 260, restaurant: "McDonald's", category: "Burger", cuisine: "American", isVeg: false, description: "Two grilled patties with double cheddar cheese.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Veg Crispy Burger", videoUrl: VIDEOS[6], imageUrl: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=800&auto=format&fit=crop", price: 99, restaurant: "McDonald's", category: "Burger", cuisine: "American", isVeg: true, description: "Crispy veg patty with fresh lettuce and mayo.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Spicy Zinger Burger", videoUrl: VIDEOS[7], imageUrl: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=800&auto=format&fit=crop", price: 180, restaurant: "KFC", category: "Burger", cuisine: "American", isVeg: false, description: "Extra crispy spicy chicken fillet on a toasted bun.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Paneer Maharaja", videoUrl: VIDEOS[8], imageUrl: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?q=80&w=800&auto=format&fit=crop", price: 210, restaurant: "Burger King", category: "Burger", cuisine: "Indian", isVeg: true, description: "King-sized paneer patty with spicy sauces.", createdBy: partner._id, likes: [], comments: [] },
+    // --- 🇲🇽 MEXICAN ---
+    { 
+      name: "Street Style Tacos", 
+      videoUrl: "/videos/reel2.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1565299585323-38d6b0865597?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=200&auto=format&fit=crop",
+      price: 290, 
+      restaurant: "Tacology", 
+      category: "Tacos", 
+      cuisine: "Mexican", 
+      isVeg: false, 
+      description: "Corn tortillas filled with grilled meat, cilantro, onions, and spicy salsa.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Loaded Veggie Nachos", 
+      videoUrl: "/videos/reel2.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1565895405138-6c3a1555da6a?q=80&w=200&auto=format&fit=crop",
+      price: 320, 
+      restaurant: "Mexi-Grill", 
+      category: "Snacks", 
+      cuisine: "Mexican", 
+      isVeg: true, 
+      description: "Crispy chips loaded with cheese, jalapeños, beans, and fresh guacamole.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Chicken Quesadilla", 
+      videoUrl: "/videos/reel2.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?q=80&w=200&auto=format&fit=crop",
+      price: 360, 
+      restaurant: "Zocalo", 
+      category: "Other", 
+      cuisine: "Mexican", 
+      isVeg: false, 
+      description: "Toasted tortilla oozing with cheese and seasoned chicken.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
 
-    // --- CHINESE ---
-    { name: "Schezwan Fried Rice", videoUrl: VIDEOS[9], imageUrl: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?q=80&w=800&auto=format&fit=crop", price: 190, restaurant: "Mainland China", category: "Other", cuisine: "Chinese", isVeg: true, description: "Spicy rice tossed with garlic and schezwan chilies.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Hakka Noodles Special", videoUrl: VIDEOS[10], imageUrl: "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=800&auto=format&fit=crop", price: 180, restaurant: "Yo! China", category: "Other", cuisine: "Chinese", isVeg: true, description: "Classic wok-fried noodles with fresh vegetables.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Manchurian Dry", videoUrl: VIDEOS[11], imageUrl: "https://images.unsplash.com/photo-1637806930600-37fa8892069d?q=80&w=800&auto=format&fit=crop", price: 160, restaurant: "Chowman", category: "Snacks", cuisine: "Chinese", isVeg: true, description: "Crispy veg balls in a tangy soya-garlic sauce.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Spring Rolls (4 Pcs)", videoUrl: VIDEOS[0], imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop", price: 140, restaurant: "Bercos", category: "Snacks", cuisine: "Chinese", isVeg: true, description: "Crunchy fried rolls stuffed with seasoned vegetables.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Kung Pao Chicken", videoUrl: VIDEOS[1], imageUrl: "https://images.unsplash.com/photo-1525755662778-989d0524087e?q=80&w=800&auto=format&fit=crop", price: 310, restaurant: "Mainland China", category: "Other", cuisine: "Chinese", isVeg: false, description: "Spicy stir-fry chicken with peanuts and peppers.", createdBy: partner._id, likes: [], comments: [] },
+    // --- 🇺🇸 AMERICAN ---
+    { 
+      name: "Double Smash Burger", 
+      videoUrl: "/videos/reel2.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=200&auto=format&fit=crop",
+      price: 350, 
+      restaurant: "Burger Junction", 
+      category: "Burger", 
+      cuisine: "American", 
+      isVeg: false, 
+      description: "Two juicy patties smashed with cheese and caramelized onions.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "BBQ Chicken Wings", 
+      videoUrl: "/videos/reel6.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1527477396000-e27163b481c2?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=200&auto=format&fit=crop",
+      price: 310, 
+      restaurant: "Wings Mania", 
+      category: "Snacks", 
+      cuisine: "American", 
+      isVeg: false, 
+      description: "Tossed in smoky hickory BBQ sauce with a ranch dip.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Caramel Milkshake", 
+      videoUrl: "/videos/reel8.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1563191799-2c7e8c185bb3?q=80&w=200&auto=format&fit=crop",
+      price: 180, 
+      restaurant: "Liquid Gold", 
+      category: "Drinks", 
+      cuisine: "American", 
+      isVeg: true, 
+      description: "Creamy vanilla base blended with rich sea-salt caramel.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
 
-    // --- HEALTHY ---
-    { name: "Greek Salad Bowl", videoUrl: VIDEOS[2], imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=800&auto=format&fit=crop", price: 290, restaurant: "Salad Days", category: "Healthy", cuisine: "Healthy", isVeg: true, description: "Fresh cucumbers, olives, feta, and olive oil dressing.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Grilled Avocado Toast", videoUrl: VIDEOS[3], imageUrl: "https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop", price: 210, restaurant: "Blue Tokai", category: "Healthy", cuisine: "American", isVeg: true, description: "Sourdough bread topped with mashed avocado and poached egg.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Quinoa Veggie Bowl", videoUrl: VIDEOS[4], imageUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop", price: 320, restaurant: "The Good Bowl", category: "Healthy", cuisine: "Healthy", isVeg: true, description: "Power-packed quinoa with roasted chickpeas and kale.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Grilled Chicken Protein", videoUrl: VIDEOS[5], imageUrl: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?q=80&w=800&auto=format&fit=crop", price: 350, restaurant: "EatFit", category: "Healthy", cuisine: "American", isVeg: false, description: "Herb-grilled chicken breast with sweet potatoes.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Fruit Salad Energy", videoUrl: VIDEOS[6], imageUrl: "https://images.unsplash.com/photo-1490818387583-1baba5e638af?q=80&w=800&auto=format&fit=crop", price: 180, restaurant: "Fruits & Co.", category: "Healthy", cuisine: "Healthy", isVeg: true, description: "Seasonal fresh fruits with a dash of honey and lime.", createdBy: partner._id, likes: [], comments: [] },
+    // --- 🇨🇳 CHINESE / THAI ---
+    { 
+      name: "Veg Hakka Noodles", 
+      videoUrl: "/videos/reel7.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1585032226651-759b368d7246?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=200&auto=format&fit=crop",
+      price: 210, 
+      restaurant: "The Wok", 
+      category: "Other", 
+      cuisine: "Chinese", 
+      isVeg: true, 
+      description: "Classic stir-fried noodles with crisp vegetables and soya sauce.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Pad Thai Shrimps", 
+      videoUrl: "/videos/reel7.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=200&auto=format&fit=crop",
+      price: 480, 
+      restaurant: "Sawadee", 
+      category: "Main Course", 
+      cuisine: "Thai", 
+      isVeg: false, 
+      description: "Sweet and tangy rice noodles with peanuts and fresh shrimps.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Dim Sum Basket", 
+      videoUrl: "/videos/reel7.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?q=80&w=200&auto=format&fit=crop",
+      price: 320, 
+      restaurant: "Steam Hub", 
+      category: "Starters", 
+      cuisine: "Chinese", 
+      isVeg: true, 
+      description: "Assorted vegetarian dumplings steamed to perfection.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
 
-    // --- DRINKS ---
-    { name: "Iced Caramel Macchiato", videoUrl: VIDEOS[7], imageUrl: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?q=80&w=800&auto=format&fit=crop", price: 190, restaurant: "Starbucks", category: "Drinks", cuisine: "American", isVeg: true, description: "Espresso combined with vanilla and caramel flavors.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Blueberry Mojito", videoUrl: VIDEOS[8], imageUrl: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=800&auto=format&fit=crop", price: 160, restaurant: "Social", category: "Drinks", cuisine: "American", isVeg: true, description: "Refreshing mocktail with blueberries and mint.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Fresh Mango Shake", videoUrl: VIDEOS[9], imageUrl: "https://images.unsplash.com/photo-1546173159-315724a31696?q=80&w=800&auto=format&fit=crop", price: 140, restaurant: "Keventers", category: "Drinks", cuisine: "Indian", isVeg: true, description: "Creamy seasonal mango pulp blended with milk.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Sparkling Lemonade", videoUrl: VIDEOS[10], imageUrl: "https://images.unsplash.com/photo-1534353436294-0dbd4bdac845?q=80&w=800&auto=format&fit=crop", price: 120, restaurant: "Cafe Coffee Day", category: "Drinks", cuisine: "American", isVeg: true, description: "Zesty lemon with mint and sparkling water.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Masala Chai Flask", videoUrl: VIDEOS[11], imageUrl: "https://images.unsplash.com/photo-1517631232814-72e399564177?q=80&w=800&auto=format&fit=crop", price: 99, restaurant: "Chai Point", category: "Drinks", cuisine: "Indian", isVeg: true, description: "Hot aromatic Indian tea brewed with ginger and cardamom.", createdBy: partner._id, likes: [], comments: [] },
+    // --- 🥗 HEALTHY / MEDITERRANEAN ---
+    { 
+      name: "Quinoa Avocado Bowl", 
+      videoUrl: "/videos/reel5.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=200&auto=format&fit=crop",
+      price: 360, 
+      restaurant: "Green Glow", 
+      category: "Healthy", 
+      cuisine: "Healthy", 
+      isVeg: true, 
+      description: "Superfood bowl with fresh greens, feta, and lemon dressing.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Hummus & Falafel", 
+      videoUrl: "/videos/reel5.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?q=80&w=200&auto=format&fit=crop",
+      price: 280, 
+      restaurant: "Olive Tree", 
+      category: "Healthy", 
+      cuisine: "Mediterranean", 
+      isVeg: true, 
+      description: "Creamy hummus served with crispy chickpea falafels and pita.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Grilled Greek Chicken", 
+      videoUrl: "/videos/reel5.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1632778149975-40045263a941?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1632778149975-40045263a941?q=80&w=200&auto=format&fit=crop",
+      price: 440, 
+      restaurant: "Mediterranean Grill", 
+      category: "Healthy", 
+      cuisine: "Mediterranean", 
+      isVeg: false, 
+      description: "Herb-marinated chicken breast served with roasted veggies.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
 
-    // --- DESSERT ---
-    { name: "Hot Chocolate Fudge", videoUrl: VIDEOS[0], imageUrl: "https://images.unsplash.com/photo-1624319086708-55894ec1bb92?q=80&w=800&auto=format&fit=crop", price: 150, restaurant: "Corner House", category: "Dessert", cuisine: "American", isVeg: true, description: "Vanilla ice cream smothered in thick gooey hot chocolate fudge.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Gulab Jamun (2 Pcs)", videoUrl: VIDEOS[1], imageUrl: "https://images.unsplash.com/photo-1589112773104-814631023071?q=80&w=800&auto=format&fit=crop", price: 80, restaurant: "Haldiram's", category: "Dessert", cuisine: "Indian", isVeg: true, description: "Soft milk-based balls soaked in sweet sugar syrup.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "New York Cheesecake", videoUrl: VIDEOS[2], imageUrl: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?q=80&w=800&auto=format&fit=crop", price: 280, restaurant: "Theobroma", category: "Dessert", cuisine: "American", isVeg: true, description: "Rich, creamy cheesecake with a classic graham cracker crust.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Tiramisu Classic", videoUrl: VIDEOS[3], imageUrl: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?q=80&w=800&auto=format&fit=crop", price: 320, restaurant: "Little Italy", category: "Dessert", cuisine: "Italian", isVeg: true, description: "Coffee-flavored Italian dessert with mascarpone cheese.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Death by Chocolate", videoUrl: VIDEOS[4], imageUrl: "https://images.unsplash.com/photo-1511911063855-2bf39afa5b2e?q=80&w=800&auto=format&fit=crop", price: 290, restaurant: "Polar Bear", category: "Dessert", cuisine: "American", isVeg: true, description: "Layers of chocolate cake, ice cream, and dark chocolate sauce.", createdBy: partner._id, likes: [], comments: [] },
+    // --- 🍰 DESSERTS ---
+    { 
+      name: "Warm Choco Lava Cake", 
+      videoUrl: "/videos/reel4.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1624319086708-55894ec1bb92?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1624319086708-55894ec1bb92?q=80&w=200&auto=format&fit=crop",
+      price: 220, 
+      restaurant: "Treat Corner", 
+      category: "Dessert", 
+      cuisine: "American", 
+      isVeg: true, 
+      description: "Gooey chocolate center served with a scoop of vanilla bean ice cream.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Classic New York Cheesecake", 
+      videoUrl: "/videos/reel4.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?q=80&w=200&auto=format&fit=crop",
+      price: 290, 
+      restaurant: "Sweet Escape", 
+      category: "Dessert", 
+      cuisine: "American", 
+      isVeg: true, 
+      description: "Velvety smooth cheesecake on a graham cracker crust.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Tiramisu Elegance", 
+      videoUrl: "/videos/reel10.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?q=80&w=200&auto=format&fit=crop",
+      price: 320, 
+      restaurant: "Italiano Dolce", 
+      category: "Dessert", 
+      cuisine: "Italian", 
+      isVeg: true, 
+      description: "Layers of coffee-soaked ladyfingers and mascarpone cream.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
 
-    // --- OTHER / MIXED ---
-    { name: "Sushi Platter (12 pcs)", videoUrl: VIDEOS[5], imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=800&auto=format&fit=crop", price: 520, restaurant: "Oishii Sushi", category: "Other", cuisine: "Japanese", isVeg: false, description: "Assorted fresh sushi, nigiri and sashimi platter.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Dimsum Basket Veg", videoUrl: VIDEOS[6], imageUrl: "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?q=80&w=800&auto=format&fit=crop", price: 280, restaurant: "Yauatcha", category: "Snacks", cuisine: "Chinese", isVeg: true, description: "Steamed vegetable dumplings served with spicy dip.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Falafel Wrap Classic", videoUrl: VIDEOS[7], imageUrl: "https://images.unsplash.com/photo-1547058881-90bb7f3987c5?q=80&w=800&auto=format&fit=crop", price: 180, restaurant: "Habibi", category: "Other", cuisine: "Mediterranean", isVeg: true, description: "Crispy falafel balls with hummus and fresh veggies.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Chicken Tikka Roll", videoUrl: VIDEOS[8], imageUrl: "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?q=80&w=800&auto=format&fit=crop", price: 160, restaurant: "Faasos", category: "Snacks", cuisine: "Indian", isVeg: false, description: "Spicy chicken tikka wrapped in a soft paratha.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Burrito Bowl Veg", videoUrl: VIDEOS[9], imageUrl: "https://images.unsplash.com/photo-1522036667459-7b75ecb0a5bf?q=80&w=800&auto=format&fit=crop", price: 260, restaurant: "Taco Bell", category: "Other", cuisine: "Mexican", isVeg: true, description: "Mexican rice with beans, corn, and fresh salsa.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Pad Thai Noodles", videoUrl: VIDEOS[10], imageUrl: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=800&auto=format&fit=crop", price: 340, restaurant: "Mamagoto", category: "Other", cuisine: "Chinese", isVeg: false, description: "Stir-fried rice noodles with eggs and crushed peanuts.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Hummus with Pita", videoUrl: VIDEOS[11], imageUrl: "https://images.unsplash.com/photo-1623341214825-9f4f963727da?q=80&w=800&auto=format&fit=crop", price: 210, restaurant: "Zaza Kitchen", category: "Snacks", cuisine: "Mediterranean", isVeg: true, description: "Smooth chickpea dip served with warm fluffy pita.", createdBy: partner._id, likes: [], comments: [] },
+    // --- 🌯 ROLLS / WRAPS ---
+    { 
+      name: "Paneer Kathi Roll", 
+      videoUrl: "/videos/reel9.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1626776876729-babd0f0a53b4?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=200&auto=format&fit=crop",
+      price: 180, 
+      restaurant: "Roll Junction", 
+      category: "Rolls", 
+      cuisine: "Indian", 
+      isVeg: true, 
+      description: "Spiced paneer and onions wrapped in a soft paratha.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
+    { 
+      name: "Chicken Shawarma Wrap", 
+      videoUrl: "/videos/reel6.mp4", 
+      imageUrl: "https://images.unsplash.com/photo-1561651823-34fed022530b?q=80&w=800&auto=format&fit=crop", 
+      restaurantImageUrl: "https://images.unsplash.com/photo-1561651823-34fed022530b?q=80&w=200&auto=format&fit=crop",
+      price: 220, 
+      restaurant: "Middle East Bites", 
+      category: "Rolls", 
+      cuisine: "Mediterranean", 
+      isVeg: false, 
+      description: "Slow-roasted chicken with garlic sauce and pickles.", 
+      createdBy: partner._id, likes: [], comments: [] 
+    },
 
-    // --- NEW ADDITIONS ---
-    { name: "Salmon Nigiri (6 pcs)", videoUrl: VIDEOS[0], imageUrl: "https://images.unsplash.com/photo-1583623025817-d180a2221d0a?q=80&w=800&auto=format&fit=crop", price: 450, restaurant: "Sushi House", category: "Other", cuisine: "Japanese", isVeg: false, description: "Fresh Atlantic salmon over seasoned rice.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Spicy Tuna Roll", videoUrl: VIDEOS[1], imageUrl: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?q=80&w=800&auto=format&fit=crop", price: 380, restaurant: "Tokyo Express", category: "Other", cuisine: "Japanese", isVeg: false, description: "Tuna with spicy mayo and cucumber.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Tonkotsu Ramen", videoUrl: VIDEOS[2], imageUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?q=80&w=800&auto=format&fit=crop", price: 420, restaurant: "Ramen Sun", category: "Other", cuisine: "Japanese", isVeg: false, description: "Rich pork bone broth with chashu and soft egg.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Street Style Tacos (3 pcs)", videoUrl: VIDEOS[3], imageUrl: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?q=80&w=800&auto=format&fit=crop", price: 250, restaurant: "Taco Loco", category: "Other", cuisine: "Mexican", isVeg: false, description: "Braised beef with cilantro and onion on corn tortillas.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Quesadilla Supreme", videoUrl: VIDEOS[4], imageUrl: "https://images.unsplash.com/photo-1599974579688-8dbdd335c7b8?q=80&w=800&auto=format&fit=crop", price: 280, restaurant: "Mexican Grill", category: "Other", cuisine: "Mexican", isVeg: true, description: "Cheesy goodness with bell peppers and onions.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Fettuccine Alfredo", videoUrl: VIDEOS[5], imageUrl: "https://images.unsplash.com/photo-1645112481355-d56113b825ad?q=80&w=800&auto=format&fit=crop", price: 350, restaurant: "Pasta King", category: "Other", cuisine: "Italian", isVeg: true, description: "Creamy white sauce pasta with parmesan cheese.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Lasagna Bolognese", videoUrl: VIDEOS[6], imageUrl: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=800&auto=format&fit=crop", price: 480, restaurant: "The Italian Table", category: "Other", cuisine: "Italian", isVeg: false, description: "Layered pasta with meat sauce and bechamel.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Grilled Chicken Steak", videoUrl: VIDEOS[7], imageUrl: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?q=80&w=800&auto=format&fit=crop", price: 550, restaurant: "Steak House", category: "Other", cuisine: "American", isVeg: false, description: "Juicy chicken breast served with mashed potatoes.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "BBQ Pork Ribs", videoUrl: VIDEOS[8], imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop", price: 750, restaurant: "Texas BBQ", category: "Other", cuisine: "American", isVeg: false, description: "Fall-off-the-bone ribs with smoky BBQ sauce.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Philly Cheesesteak", videoUrl: VIDEOS[9], imageUrl: "https://images.unsplash.com/photo-1563245332-6922aa027415?q=80&w=800&auto=format&fit=crop", price: 320, restaurant: "Sub Way", category: "Other", cuisine: "American", isVeg: false, description: "Thinly sliced steak with melted cheese in a hoagie roll.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Rainbow Smoothie Bowl", videoUrl: VIDEOS[10], imageUrl: "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?q=80&w=800&auto=format&fit=crop", price: 290, restaurant: "Smoothie King", category: "Healthy", cuisine: "Healthy", isVeg: true, description: "Acai base topped with fresh fruits and granola.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Avocado Chicken Salad", videoUrl: VIDEOS[11], imageUrl: "https://images.unsplash.com/photo-1546793665-c74683c3f43d?q=80&w=800&auto=format&fit=crop", price: 340, restaurant: "Green Leaf", category: "Healthy", cuisine: "Healthy", isVeg: false, description: "Mixed greens with grilled chicken and avocado slices.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Oreo Cheesecake", videoUrl: VIDEOS[0], imageUrl: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?q=80&w=800&auto=format&fit=crop", price: 320, restaurant: "Dessert Parlor", category: "Dessert", cuisine: "American", isVeg: true, description: "Creamy cheesecake with oreo cookie base and toppings.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Warm Apple Pie", videoUrl: VIDEOS[1], imageUrl: "https://images.unsplash.com/photo-1568571780765-9276ac8b75a2?q=80&w=800&auto=format&fit=crop", price: 240, restaurant: "Baker's Dozen", category: "Dessert", cuisine: "American", isVeg: true, description: "Traditional apple pie served with a scoop of vanilla ice cream.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Strawberry Margarita", videoUrl: VIDEOS[2], imageUrl: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?q=80&w=800&auto=format&fit=crop", price: 280, restaurant: "Cocktail Bar", category: "Drinks", cuisine: "American", isVeg: true, description: "Classic margarita with fresh strawberries and lime.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Cold Brew Coffee", videoUrl: VIDEOS[3], imageUrl: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?q=80&w=800&auto=format&fit=crop", price: 180, restaurant: "Brew Master", category: "Drinks", cuisine: "American", isVeg: true, description: "Slow-steeped cold brew coffee for a smooth finish.", createdBy: partner._id, likes: [], comments: [] },
-    { name: "Green Matcha Latte", videoUrl: VIDEOS[4], imageUrl: "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?q=80&w=800&auto=format&fit=crop", price: 220, restaurant: "Zen Tea", category: "Drinks", cuisine: "Japanese", isVeg: true, description: "Premium grade matcha with steamed milk.", createdBy: partner._id, likes: [], comments: [] }
+    // --- Extra Variety to hit 40 ---
+    { name: "Pesto Pasta Fusion", videoUrl: "/videos/reel7.mp4", imageUrl: "https://images.unsplash.com/photo-1473093226795-af9932fe5856?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=200&auto=format&fit=crop", price: 380, restaurant: "Pasta Bella", category: "Pasta", cuisine: "Italian", isVeg: true, description: "Fresh basil pesto with pine nuts and sun-dried tomatoes.", createdBy: partner._id, likes: [], comments: [] },
+    { name: "Margarita Cocktail", videoUrl: "/videos/reel8.mp4", imageUrl: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=200&auto=format&fit=crop", price: 150, restaurant: "Liquid Gold", category: "Drinks", cuisine: "Mexican", isVeg: true, description: "Zesty and refreshing lime cocktail with a salt rim.", createdBy: partner._id, likes: [], comments: [] },
+    { name: "BBQ Paneer Pizza", videoUrl: "/videos/reel1.mp4", imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=200&auto=format&fit=crop", price: 499, restaurant: "Pizza Hut", category: "Pizza", cuisine: "Italian", isVeg: true, description: "Tangy BBQ sauce with grilled paneer and onions.", createdBy: partner._id, likes: [], comments: [] },
+    { name: "Fish & Chips", videoUrl: "/videos/reel6.mp4", imageUrl: "https://images.unsplash.com/photo-1524339102455-66097b447883?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1524339102455-66097b447883?q=80&w=200&auto=format&fit=crop", price: 420, restaurant: "The Dock", category: "Main Course", cuisine: "Continental", isVeg: false, description: "Crispy battered fish served with chunky fries and tartar sauce.", createdBy: partner._id, likes: [], comments: [] },
+    { name: "Veg Manchurian", videoUrl: "/videos/reel7.mp4", imageUrl: "https://images.unsplash.com/photo-1512058560374-140ddf61726a?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1512058560374-140ddf61726a?q=80&w=200&auto=format&fit=crop", price: 190, restaurant: "Wok Express", category: "Starters", cuisine: "Chinese", isVeg: true, description: "Veggie balls in a spicy, umami-rich soy and ginger gravy.", createdBy: partner._id, likes: [], comments: [] },
+    { name: "Falafel Salad", videoUrl: "/videos/reel5.mp4", imageUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=200&auto=format&fit=crop", price: 280, restaurant: "Green Glow", category: "Healthy", cuisine: "Healthy", isVeg: true, description: "Crunchy salad bowls with hot falafels and tahini.", createdBy: partner._id, likes: [], comments: [] },
+    { name: "Salmon Sushi Nigiri", videoUrl: "/videos/reel7.mp4", imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=200&auto=format&fit=crop", price: 580, restaurant: "Sushi Zen", category: "Sushi", cuisine: "Japanese", isVeg: false, description: "Fresh slices of premium salmon over hand-pressed vinegared rice.", createdBy: partner._id, likes: [], comments: [] },
+    { name: "Beef Steak Fries", videoUrl: "/videos/reel6.mp4", imageUrl: "https://images.unsplash.com/photo-1606755962773-d324e0a13ea0?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1606755962773-d324e0a13ea0?q=80&w=200&auto=format&fit=crop", price: 450, restaurant: "Steak House", category: "Main Course", cuisine: "American", isVeg: false, description: "Perfectly seared beef steak served with peppercorn sauce.", createdBy: partner._id, likes: [], comments: [] },
+    { name: "Thai Green Curry", videoUrl: "/videos/reel5.mp4", imageUrl: "https://images.unsplash.com/photo-1455619411447-960250dfc252?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1455619411447-960250dfc252?q=80&w=200&auto=format&fit=crop", price: 390, restaurant: "Lotus Pad", category: "Main Course", cuisine: "Thai", isVeg: true, description: "Coconut-based curry with bamboo shoots and aromatic basil.", createdBy: partner._id, likes: [], comments: [] },
+    { name: "Blueberry Cheesecake", videoUrl: "/videos/reel4.mp4", imageUrl: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=200&auto=format&fit=crop", price: 290, restaurant: "Sweet Escape", category: "Dessert", cuisine: "American", isVeg: true, description: "Creamy cheesecake topped with fresh blueberry compote.", createdBy: partner._id, likes: [], comments: [] },
+    { name: "Butter Garlic Naan", videoUrl: "/videos/reel9.mp4", imageUrl: "https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?q=80&w=200&auto=format&fit=crop", price: 60, restaurant: "The Tandoor", category: "Bread", cuisine: "North Indian", isVeg: true, description: "Soft, leavened bread with a generous glaze of garlic butter.", createdBy: partner._id, likes: [], comments: [] }
   ];
+
 
   const insertedFoods = await Food.insertMany(sampleFoods);
   console.log(`Successfully seeded ${sampleFoods.length} beautiful food entries into DB!`);

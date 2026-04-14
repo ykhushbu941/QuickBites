@@ -19,6 +19,12 @@ const foodSchema = new mongoose.Schema(
       default: ""
     },
 
+    // 🏪 Restaurant logo/image
+    restaurantImageUrl: {
+      type: String,
+      default: ""
+    },
+
     price: {
       type: Number,
       required: true
@@ -49,7 +55,7 @@ const foodSchema = new mongoose.Schema(
     cuisine: {
       type: String,
       default: "Other",
-      enum: ["Indian", "South Indian", "Chinese", "Italian", "Mexican", "American", "Japanese", "Healthy", "Mediterranean", "Other"]
+      enum: ["Indian", "North Indian", "South Indian", "Chinese", "Thai", "Italian", "Mexican", "American", "Japanese", "Healthy", "Mediterranean", "Continental", "Other"]
     },
 
     // 👤 who added this (partner)

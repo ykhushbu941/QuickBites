@@ -76,3 +76,14 @@ exports.toggleSaveFood = async (req, res) => {
     res.status(500).json({ msg: "Error toggling saved food", error: err.message });
   }
 };
+
+exports.checkRole = async (req, res) => {
+  try {
+    const { email } = req.query;
+    const user = await User.findOne({ email }).select("role");
+    if (!user) return res.json({ role: null });
+    res.json({ role: user.role });
+  } catch (err) {
+    res.status(500).json({ msg: "Error checking role" });
+  }
+};

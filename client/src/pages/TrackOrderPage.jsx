@@ -40,6 +40,16 @@ export default function TrackOrderPage() {
     return () => clearInterval(interval);
   }, [orderId]);
 
+  const handleCancelOrder = async () => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+    try {
+      const res = await axios.put(`/api/orders/${orderId}/cancel`);
+      setOrder(res.data);
+    } catch (err) {
+      alert(err.response?.data?.msg || "Failed to cancel order");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
@@ -111,9 +121,19 @@ export default function TrackOrderPage() {
                     <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Order ID: #{orderId.substring(orderId.length - 8)}</p>
                  </div>
               </div>
-              <button className="p-3 bg-[var(--bg-primary)] rounded-xl hover:bg-[var(--brand-orange)]/10 text-[var(--brand-orange)] transition-colors">
-                 <HelpCircle className="w-5 h-5" />
-              </button>
+              <div className="flex gap-2">
+                 {!isCancelled && order.status === "Pending" && (
+                   <button 
+                     onClick={handleCancelOrder}
+                     className="px-4 py-2 bg-red-500/10 text-red-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all border border-red-500/20"
+                   >
+                     Cancel Order
+                   </button>
+                 )}
+                 <button className="p-3 bg-[var(--bg-primary)] rounded-xl hover:bg-[var(--brand-orange)]/10 text-[var(--brand-orange)] transition-colors">
+                    <HelpCircle className="w-5 h-5" />
+                 </button>
+              </div>
            </div>
         </div>
       </div>

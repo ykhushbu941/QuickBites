@@ -20,17 +20,37 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const res = await axios.post("/api/auth/user/login", { email, password });
-      setLoginType(res.data.role);
-      login(res.data.token, res.data.role, res.data.user);
-      if (res.data.role === "partner") {
+      const res = await axios.get(`/api/auth/user/check-role?email=${email}`);
+      const userRole = res.data.role;
+
+      if (userRole && userRole !== loginType) {
+        setLoading(false);
+        setError(`This account is registered as a ${userRole === "partner" ? "Partner" : "Foodie"}. Please switch to the correct tab.`);
+        return;
+      }
+
+      const loginRes = await axios.post("/api/auth/user/login", { email, password });
+      login(loginRes.data.token, loginRes.data.role, loginRes.data.user);
+      
+      if (loginRes.data.role === "partner") {
         navigate("/dashboard");
       } else {
         navigate("/home");
       }
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.msg || err.message || "Failed to login. Is the server running?");
+      // If check-role fails, just try to login anyway (maybe legacy account)
+      try {
+        const res = await axios.post("/api/auth/user/login", { email, password });
+        login(res.data.token, res.data.role, res.data.user);
+        if (res.data.role === "partner") {
+          navigate("/dashboard");
+        } else {
+          navigate("/home");
+        }
+      } catch (loginErr) {
+        setError(loginErr.response?.data?.msg || loginErr.message || "Failed to login.");
+      }
     } finally {
       setLoading(false);
     }

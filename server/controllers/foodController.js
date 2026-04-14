@@ -75,7 +75,7 @@ exports.likeFood = async (req, res) => {
 // ✅ ADD FOOD (Partner Only)
 exports.addFood = async (req, res) => {
   try {
-    const { name, videoUrl, price, restaurant, description, category } = req.body;
+    const { name, videoUrl, price, restaurant, description, category, imageUrl, restaurantImageUrl, isVeg, cuisine } = req.body;
 
     if (!name || !videoUrl || !price || !restaurant) {
       return res.status(400).json({ msg: "All required fields must be filled" });
@@ -88,6 +88,10 @@ exports.addFood = async (req, res) => {
       restaurant,
       description,
       category,
+      imageUrl,
+      restaurantImageUrl,
+      isVeg,
+      cuisine,
       createdBy: req.user.id
     });
 

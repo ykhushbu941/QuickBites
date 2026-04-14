@@ -18,10 +18,14 @@ export default function Register() {
     e.preventDefault();
     setError("");
     setLoading(true);
+    console.log("Registering with payload:", user);
     try {
       await axios.post("/api/auth/user/register", user);
       
+      console.log("Registration successful, logging in...");
       const res = await axios.post("/api/auth/user/login", { email: user.email, password: user.password });
+      console.log("Login res:", res.data);
+      
       login(res.data.token, res.data.role, res.data.user);
 
       if (res.data.role === "partner") {
@@ -30,7 +34,7 @@ export default function Register() {
         navigate("/home");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Registration/Login Error:", err);
       setError(err.response?.data?.msg || err.message || "Failed to register. Is the server running?");
     } finally {
       setLoading(false);
