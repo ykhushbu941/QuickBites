@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import axios from "axios";
+import API from "../api/api";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, ChefHat, UtensilsCrossed } from "lucide-react";
@@ -20,7 +20,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const res = await axios.get(`/api/auth/user/check-role?email=${email}`);
+      const res = await API.get(`/auth/user/check-role?email=${email}`);
       const userRole = res.data.role;
 
       if (userRole && userRole !== loginType) {
@@ -29,7 +29,7 @@ export default function Login() {
         return;
       }
 
-      const loginRes = await axios.post("/api/auth/user/login", { email, password });
+      const loginRes = await API.post("/auth/user/login", { email, password });
       login(loginRes.data.token, loginRes.data.role, loginRes.data.user);
       
       if (loginRes.data.role === "partner") {
@@ -41,7 +41,7 @@ export default function Login() {
       console.error(err);
       // If check-role fails, just try to login anyway (maybe legacy account)
       try {
-        const res = await axios.post("/api/auth/user/login", { email, password });
+        const res = await API.post("/auth/user/login", { email, password });
         login(res.data.token, res.data.role, res.data.user);
         if (res.data.role === "partner") {
           navigate("/dashboard");
