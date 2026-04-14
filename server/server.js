@@ -36,8 +36,8 @@ const path = require("path");
 // ❌ Error Handling Middleware (must be last)
 app.use(errorHandler);
 
-// Serve frontend in production
-if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "deploy") {
+// Serve frontend in production (Only if not on Vercel which handles this via vercel.json)
+if (process.env.NODE_ENV === "production" && !process.env.VERCEL) {
   app.use(express.static(path.join(__dirname, "../client/dist")));
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
