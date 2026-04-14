@@ -1,9 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { token, role, loading } = useContext(AuthContext);
+  
+  useEffect(() => {
+    if (!loading && token) {
+      if (role === "partner") {
+        navigate("/dashboard");
+      } else {
+        navigate("/home");
+      }
+    }
+  }, [token, role, loading, navigate]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

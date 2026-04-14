@@ -107,6 +107,27 @@ export default function HomePage() {
 
   return (
     <div className="max-w-md md:max-w-7xl mx-auto min-h-screen px-4 md:px-8 py-4 pt-16 bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
+      
+      {/* 👨‍🍳 Partner Awareness Banner */}
+      {role === "partner" && (
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 -mx-2 bg-gradient-to-r from-[var(--brand-orange)]/10 to-transparent border-l-4 border-[var(--brand-orange)] p-5 rounded-2xl flex items-center justify-between shadow-sm"
+        >
+          <div>
+            <p className="text-[var(--text-primary)] font-black text-sm uppercase tracking-tighter">Partner Mode active</p>
+            <p className="text-[var(--text-secondary)] text-[11px] font-bold">You are currently viewing the platform as a Foodie.</p>
+          </div>
+          <button 
+            onClick={() => navigate('/dashboard')}
+            className="bg-[var(--brand-orange)] text-white px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-95 transition-all"
+          >
+            Manage Orders
+          </button>
+        </motion.div>
+      )}
+
       <AnimatePresence>
         {toast && (
           <motion.div 

@@ -23,6 +23,11 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await API.get("/auth/user/me");
       setUser(res.data);
+      // 🔥 Always sync the role from the backend as the source of truth
+      if (res.data.role) {
+        setRole(res.data.role);
+        localStorage.setItem("role", res.data.role);
+      }
     } catch (error) {
       console.error("Token invalid or expired", error);
       logout();
