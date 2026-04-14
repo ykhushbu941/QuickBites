@@ -93,7 +93,10 @@ function seedData(forceOverwrite = false) {
   });
 
   if (forceOverwrite) {
-    db.set("foods", foodsWithIds).write();
+    console.log("🧹 Cleaning old food records...");
+    db.set("foods", []).write();
+    db.set("orders", []).write(); 
+    db.get("foods").push(...foodsWithIds).write();
   } else {
     db.get("foods").push(...foodsWithIds).write();
   }

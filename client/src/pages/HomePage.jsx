@@ -11,9 +11,16 @@ const CATEGORIES = ["All", "Pizza", "Burger", "Dessert", "Drinks", "Snacks", "He
 const CUISINES = ["All", "Indian", "South Indian", "Chinese", "Italian", "Mexican", "American", "Japanese", "Healthy", "Mediterranean"];
 
 const CUISINE_ICONS = {
-  All: "🌎", "Indian": "🇮🇳", "South Indian": "🍛", "Chinese": "🏮",
-  "Italian": "🍕", "Mexican": "🌮", "American": "🍔", "Japanese": "🍣",
-  "Healthy": "🥗", "Mediterranean": "🥙"
+  All: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=200&auto=format&fit=crop", 
+  "Indian": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?q=80&w=200&auto=format&fit=crop", 
+  "South Indian": "https://images.unsplash.com/photo-1589301760014-d929f3979bdb?q=80&w=200&auto=format&fit=crop", 
+  "Chinese": "https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=200&auto=format&fit=crop",
+  "Italian": "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?q=80&w=200&auto=format&fit=crop", 
+  "Mexican": "https://images.unsplash.com/photo-1565299585323-38d6b0865597?q=80&w=200&auto=format&fit=crop", 
+  "American": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=200&auto=format&fit=crop", 
+  "Japanese": "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=200&auto=format&fit=crop",
+  "Healthy": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=200&auto=format&fit=crop", 
+  "Mediterranean": "https://images.unsplash.com/photo-1544124499-58962f3bd3a7?q=80&w=200&auto=format&fit=crop"
 };
 
 export default function HomePage() {
@@ -219,12 +226,12 @@ export default function HomePage() {
               onClick={() => setCuisine(c)}
               className="flex flex-col items-center shrink-0 group transition-all duration-300"
             >
-              <div className={`w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center text-4xl md:text-5xl mb-3 transition-all duration-300 ease-out group-active:scale-95 ${
+              <div className={`w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center overflow-hidden mb-3 transition-all duration-300 ease-out group-active:scale-95 ${
                 cuisine === c
-                  ? "bg-orange-50 border-4 border-[var(--brand-orange)] shadow-md shadow-orange-400/25"
-                  : "bg-[var(--bg-surface)] border-2 border-gray-200 dark:border-gray-700 hover:border-orange-300"
+                  ? "border-4 border-[var(--brand-orange)] shadow-md shadow-orange-400/25 scale-110"
+                  : "border-2 border-gray-200 dark:border-gray-700 hover:border-orange-300"
               }`}>
-                <span className={`transition-transform duration-500 group-hover:scale-110 ${cuisine === c ? "" : "opacity-80 group-hover:opacity-100"}`}>{CUISINE_ICONS[c]}</span>
+                <img src={CUISINE_ICONS[c]} alt={c} className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-125 ${cuisine === c ? "" : "opacity-90 group-hover:opacity-100"}`} />
               </div>
               <span className={`text-[13px] md:text-[15px] tracking-tight transition-colors mt-1 ${
                 cuisine === c 
