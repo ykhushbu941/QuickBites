@@ -22,8 +22,5 @@
       "source": "/(.*)",
       "destination": "/client/$1"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
