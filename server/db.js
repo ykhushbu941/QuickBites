@@ -10,14 +10,21 @@ const dbPath = isProd ? path.join("/tmp", "db.json") : path.join(__dirname, "db.
 const adapter = new FileSync(dbPath);
 const db = low(adapter);
 
+const DB_VERSION = "v3"; // Bump to force re-seed on production
+
 // ─── Set Defaults ─────────────────────────────────────────────────
 function initDb() {
   try {
-    db.defaults({ users: [], foods: [], orders: [], reviews: [] }).write();
+    db.defaults({ version: "v1", users: [], foods: [], orders: [], reviews: [] }).write();
 
-    // Auto-seed if no foods exist
-    if (db.get("foods").size().value() === 0) {
-      seedData();
+    const currentVersion = db.get("version").value();
+    const foodCount = db.get("foods").size().value();
+
+    // Auto-seed if database is empty or outdated
+    if (currentVersion !== DB_VERSION || foodCount < 12) {
+      console.log(`🔄 DB Sync: Updating version ${currentVersion} to ${DB_VERSION}...`);
+      db.set("version", DB_VERSION).write();
+      seedData(true); // true means overwrite foods
     }
 
     console.log("✅ Local JSON database ready");
@@ -32,7 +39,7 @@ function newId() {
 }
 
 // ─── Seed Data ────────────────────────────────────────────────────
-function seedData() {
+function seedData(forceOverwrite = false) {
   console.log("🌱 Seeding initial data...");
 
   const hashed = bcrypt.hashSync("12345", 10);
@@ -57,14 +64,14 @@ function seedData() {
   const partner = db.get("users").find({ email: "partner@reelbite.com" }).value();
 
   const foods = [
-    { name: "Hyderabadi Dum Biryani", videoUrl: "/videos/reel1.mp4", imageUrl: "/images/food/biryani.png", restaurantImageUrl: "/images/food/biryani.png", price: 380, restaurant: "Biryani House", category: "Biryani", cuisine: "North Indian", isVeg: false, description: "Authentic slow-cooked basmati rice with tender marinated meat and aromatic spices." },
-    { name: "Paneer Tikka Platter", videoUrl: "/videos/reel2.mp4", imageUrl: "/images/food/paneer_tikka.png", restaurantImageUrl: "/images/food/paneer_tikka.png", price: 280, restaurant: "The Tandoor", category: "Starters", cuisine: "North Indian", isVeg: true, description: "Smoky, grilled paneer cubes marinated in a rich yogurt and spice mix." },
-    { name: "Masala Dosa Classic", videoUrl: "/videos/reel3.mp4", imageUrl: "/images/food/dosa.png", restaurantImageUrl: "/images/food/dosa.png", price: 140, restaurant: "Dakshin Vibes", category: "Breakfast", cuisine: "South Indian", isVeg: true, description: "Crispy gold fermented crepe filled with spiced potato mash served with chutney." },
-    { name: "Street Style Chaat", videoUrl: "/videos/reel4.mp4", imageUrl: "/images/food/chaat.png", restaurantImageUrl: "/images/food/chaat.png", price: 90, restaurant: "Chaat Corner", category: "Other", cuisine: "Indian", isVeg: true, description: "A burst of sweet, spicy, and tangy flavors in every bite." },
-    { name: "Butter Chicken Mastery", videoUrl: "/videos/reel5.mp4", imageUrl: "/images/food/butter_chicken.png", restaurantImageUrl: "/images/food/butter_chicken.png", price: 450, restaurant: "Punjab Express", category: "Main Course", cuisine: "North Indian", isVeg: false, description: "Creamy, velvety tomato gravy with succulent roasted chicken pieces." },
-    { name: "Truffle Mushroom Pizza", videoUrl: "/videos/reel6.mp4", imageUrl: "/images/food/truffle_pizza.png", restaurantImageUrl: "/images/food/truffle_pizza.png", price: 549, restaurant: "Artisan Oven", category: "Pizza", cuisine: "Italian", isVeg: true, description: "Wood-fired pizza topped with wild mushrooms and premium truffle oil." },
-    { name: "Chicken Alfredo Pasta", videoUrl: "/videos/reel7.mp4", imageUrl: "/images/food/alfredo_pasta.png", restaurantImageUrl: "/images/food/alfredo_pasta.png", price: 390, restaurant: "Pasta Bella", category: "Pasta", cuisine: "Italian", isVeg: false, description: "Fettuccine tossed in a rich, buttery parmesan cream sauce with grilled chicken." },
-    { name: "Margherita Naples", videoUrl: "/videos/reel8.mp4", imageUrl: "/images/food/margherita_pizza.png", restaurantImageUrl: "/images/food/margherita_pizza.png", price: 350, restaurant: "Pizzeria Uno", category: "Pizza", cuisine: "Italian", isVeg: true, description: "The classic with fresh mozzarella, basil, and San Marzano tomatoes." },
+    { name: "Hyderabadi Dum Biryani", videoUrl: "/videos/reel1.mp4", imageUrl: "https://images.unsplash.com/photo-1589302168068-1c481193521b?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1589302168068-1c481193521b?q=80&w=800&auto=format&fit=crop", price: 380, restaurant: "Biryani House", category: "Biryani", cuisine: "North Indian", isVeg: false, description: "Authentic slow-cooked basmati rice with tender marinated meat and aromatic spices." },
+    { name: "Paneer Tikka Platter", videoUrl: "/videos/reel2.mp4", imageUrl: "https://images.unsplash.com/photo-1567184109311-5dc9504c5520?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1567184109311-5dc9504c5520?q=80&w=800&auto=format&fit=crop", price: 280, restaurant: "The Tandoor", category: "Starters", cuisine: "North Indian", isVeg: true, description: "Smoky, grilled paneer cubes marinated in a rich yogurt and spice mix." },
+    { name: "Masala Dosa Classic", videoUrl: "/videos/reel3.mp4", imageUrl: "https://images.unsplash.com/photo-1589301760014-d929f3979bdb?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1589301760014-d929f3979bdb?q=80&w=800&auto=format&fit=crop", price: 140, restaurant: "Dakshin Vibes", category: "Breakfast", cuisine: "South Indian", isVeg: true, description: "Crispy gold fermented crepe filled with spiced potato mash served with chutney." },
+    { name: "Street Style Chaat", videoUrl: "/videos/reel4.mp4", imageUrl: "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800&auto=format&fit=crop", price: 90, restaurant: "Chaat Corner", category: "Other", cuisine: "Indian", isVeg: true, description: "A burst of sweet, spicy, and tangy flavors in every bite." },
+    { name: "Butter Chicken Mastery", videoUrl: "/videos/reel5.mp4", imageUrl: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?q=80&w=800&auto=format&fit=crop", price: 450, restaurant: "Punjab Express", category: "Main Course", cuisine: "North Indian", isVeg: false, description: "Creamy, velvety tomato gravy with succulent roasted chicken pieces." },
+    { name: "Truffle Mushroom Pizza", videoUrl: "/videos/reel6.mp4", imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&auto=format&fit=crop", price: 549, restaurant: "Artisan Oven", category: "Pizza", cuisine: "Italian", isVeg: true, description: "Wood-fired pizza topped with wild mushrooms and premium truffle oil." },
+    { name: "Chicken Alfredo Pasta", videoUrl: "/videos/reel7.mp4", imageUrl: "https://images.unsplash.com/photo-1645112481338-31620a8fe368?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1645112481338-31620a8fe368?q=80&w=800&auto=format&fit=crop", price: 390, restaurant: "Pasta Bella", category: "Pasta", cuisine: "Italian", isVeg: false, description: "Fettuccine tossed in a rich, buttery parmesan cream sauce with grilled chicken." },
+    { name: "Margherita Naples", videoUrl: "/videos/reel8.mp4", imageUrl: "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?q=80&w=800&auto=format&fit=crop", price: 350, restaurant: "Pizzeria Uno", category: "Pizza", cuisine: "Italian", isVeg: true, description: "The classic with fresh mozzarella, basil, and San Marzano tomatoes." },
     { name: "Dragon Roll Sushi", videoUrl: "/videos/reel9.mp4", imageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=800&auto=format&fit=crop", price: 650, restaurant: "Sakura Zen", category: "Sushi", cuisine: "Japanese", isVeg: false, description: "Tempura shrimp roll topped with avocado and sweet eel sauce." },
     { name: "Spicy Miso Ramen", videoUrl: "/videos/reel10.mp4", imageUrl: "https://images.unsplash.com/photo-1557872246-7a79b099910f?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1557872246-7a79b099910f?q=80&w=800&auto=format&fit=crop", price: 420, restaurant: "Ramen House", category: "Main Course", cuisine: "Japanese", isVeg: false, description: "Hearty broth with hand-pulled noodles, soft-boiled egg, and pork belly." },
     { name: "Veggie Gyoza", videoUrl: "/videos/reel1.mp4", imageUrl: "https://images.unsplash.com/photo-1591814441559-075e7a5ac135?q=80&w=800&auto=format&fit=crop", restaurantImageUrl: "https://images.unsplash.com/photo-1591814441559-075e7a5ac135?q=80&w=800&auto=format&fit=crop", price: 240, restaurant: "Tokyo Treats", category: "Starters", cuisine: "Japanese", isVeg: true, description: "Pan-fried dumplings filled with seasoned vegetables." },
@@ -85,7 +92,11 @@ function seedData() {
     };
   });
 
-  db.get("foods").push(...foodsWithIds).write();
+  if (forceOverwrite) {
+    db.set("foods", foodsWithIds).write();
+  } else {
+    db.get("foods").push(...foodsWithIds).write();
+  }
 
   // Seed mock orders
   const orderNames = [
