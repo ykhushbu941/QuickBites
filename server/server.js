@@ -40,21 +40,16 @@ const path = require("path");
 // ❌ Error Handling Middleware (must be last)
 app.use(errorHandler);
 
-// Serve frontend in production (Only if not on Vercel which handles this via vercel.json)
-if (process.env.NODE_ENV === "production" && !process.env.VERCEL) {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
-  });
-}
+// Note: Static frontend serving is handled by Vercel in production.
+// This allows the backend to focus purely on the API.
 
 // 🌐 Database Connection
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("✅ MongoDB Connected"))
 .catch((err) => console.error("❌ DB Connection Error:", err.message));
 
-// Only run listen() if we are NOT on Vercel
-if (process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "deploy") {
+// Only skip listen() if we are on Vercel (serverless mode)
+if (!process.env.VERCEL) {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
