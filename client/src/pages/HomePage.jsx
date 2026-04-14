@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import axios from "axios";
+import API from "../api/api";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Search, MapPin, Grid, Flame, Soup, Pizza, Search as SearchIcon, Star, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -61,7 +61,7 @@ export default function HomePage() {
       if (vegFilter === "nonveg") params.set("isVeg", "false");
       params.set("limit", "40");
 
-      const res = await axios.get(`/api/foods?${params.toString()}`);
+      const res = await API.get(`/foods?${params.toString()}`);
       setFoods(res.data);
     } catch (err) {
       console.error("Failed to fetch foods", err);

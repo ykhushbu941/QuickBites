@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import axios from "axios";
-import { Heart, MessageCircle, Send, Plus, Store, X, CheckCircle, Bookmark, Play } from "lucide-react";
+import { Heart, MessageCircle, Send, Plus, Store, X, CheckCircle, Bookmark, Play, Star } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import API from "../api/api";
+import ReviewSection from "../components/ReviewSection";
 
 // ─────────────────────────────────────────────
 // Single Reel Card
@@ -93,7 +94,7 @@ const Reel = ({ food, isActive, isNext, index, activeIndex }) => {
 
   const toggleLike = async () => {
     try {
-      await axios.post(`/api/foods/like/${food._id}`);
+      await API.post(`/foods/like/${food._id}`);
       setIsLiked(prev => !prev);
       setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
     } catch {
@@ -104,7 +105,7 @@ const Reel = ({ food, isActive, isNext, index, activeIndex }) => {
   const toggleSave = async (e) => {
     e.stopPropagation();
     try {
-      await axios.post(`/api/auth/user/save/${food._id}`);
+      await API.post(`/auth/user/save/${food._id}`);
       setIsSaved(prev => !prev);
       showToast(isSaved ? "Removed from Saved" : "Reel Saved! 🔖");
       if (fetchUser) fetchUser();
@@ -126,19 +127,6 @@ const Reel = ({ food, isActive, isNext, index, activeIndex }) => {
     } else {
       navigator.clipboard.writeText(window.location.href).catch(() => {});
       showToast("Link copied! 📎");
-    }
-  };
-
-  const submitComment = async (e) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-    try {
-      const res = await axios.post(`/api/foods/comment/${food._id}`, { text: newComment });
-      setComments(res.data);
-      setNewComment("");
-      showToast("Comment posted!");
-    } catch {
-      showToast("Failed to post comment");
     }
   };
 
@@ -334,64 +322,13 @@ const Reel = ({ food, isActive, isNext, index, activeIndex }) => {
       {/* ── Comments Panel ── */}
       <motion.div 
          initial={false}
-         animate={{ y: showComments ? 0 : "100%", height: showComments ? "65%" : "0%" }}
+         animate={{ y: showComments ? 0 : "100%", height: showComments ? "70%" : "0%" }}
          transition={{ type: "spring", damping: 25, stiffness: 200 }}
          className="absolute bottom-0 w-full bg-[var(--bg-surface)] rounded-t-3xl border-t border-[var(--border-color)] z-30 flex flex-col shadow-2xl overflow-hidden"
          onClick={e => e.stopPropagation()}
       >
         {showComments && (
-           <>
-          <div className="flex justify-between items-center p-4 border-b border-[var(--border-color)] shrink-0">
-            <h3 className="font-bold text-[var(--text-primary)]">Comments <span className="text-xs text-[var(--text-secondary)]">({comments.length})</span></h3>
-            <button onClick={() => setShowComments(false)} className="p-1.5 bg-[var(--text-primary)]/5 rounded-full hover:bg-[var(--text-primary)]/10 transition-colors">
-              <X className="w-5 h-5 text-[var(--text-secondary)]" />
-            </button>
-          </div>
-
-          <div className="flex-grow overflow-y-auto px-4 py-4 space-y-4 no-scrollbar pb-20">
-            {comments.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-[var(--text-secondary)] space-y-2 pb-10">
-                  <MessageCircle className="w-8 h-8 opacity-20" />
-                  <p className="text-sm font-medium">No comments yet. Start the conversation!</p>
-              </div>
-            ) : (
-              comments.map((c, i) => (
-                <motion.div 
-                    key={i} 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex space-x-3"
-                >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[var(--brand-orange)] to-[#E23744] flex-shrink-0 flex items-center justify-center text-xs font-bold text-white shadow-md">
-                    {(c.user?.name || "U").charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--text-secondary)] font-semibold mb-0.5">{c.user?.name || "Anonymous User"}</p>
-                    <p className="text-[13px] text-[var(--text-primary)] bg-[var(--text-primary)]/5 border border-[var(--border-color)] px-3 py-2 rounded-2xl rounded-tl-none inline-block shadow-sm">
-                      {c.text}
-                    </p>
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
-
-          <form onSubmit={submitComment} className="absolute bottom-0 left-0 right-0 p-3 bg-[var(--bg-surface)] border-t border-[var(--border-color)] flex items-center space-x-2 shrink-0">
-            <div className="w-9 h-9 rounded-full bg-[var(--text-primary)]/10 flex-shrink-0 flex items-center justify-center text-[var(--text-primary)] font-bold text-sm">
-              {user?.name?.charAt(0).toUpperCase() || "U"}
-            </div>
-            <input
-              type="text"
-              placeholder="Add a comment..."
-              value={newComment}
-              onChange={e => setNewComment(e.target.value)}
-              className="flex-grow bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-full py-2.5 px-4 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand-orange)]/50 placeholder-[var(--text-secondary)] transition-colors"
-            />
-            <button type="submit" disabled={!newComment.trim()} className="p-2.5 text-white disabled:text-gray-500 bg-[var(--brand-orange)] disabled:bg-[var(--text-primary)]/10 rounded-full transition-colors disabled:cursor-not-allowed">
-              <Send className="w-4 h-4 ml-0.5" />
-            </button>
-          </form>
-          </>
+          <ReviewSection foodId={food._id} />
         )}
       </motion.div>
 
@@ -424,7 +361,7 @@ export default function ReelsPage() {
 
   const fetchFoods = async () => {
     try {
-      const res = await axios.get("/api/foods?limit=40");
+      const res = await API.get("/foods?limit=40");
       // Shuffle reels for fresh experience
       const shuffled = res.data.sort(() => Math.random() - 0.5);
       setFoods(shuffled);

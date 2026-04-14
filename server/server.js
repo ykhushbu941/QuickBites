@@ -8,6 +8,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const foodRoutes = require("./routes/foodRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 // Models
 const Food = require("./models/Food");
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/foods", foodRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 const path = require("path");
 

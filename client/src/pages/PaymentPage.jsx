@@ -14,7 +14,7 @@ import {
   Clock,
   MapPin
 } from "lucide-react";
-import axios from "axios";
+import API from "../api/api";
 
 export default function PaymentPage() {
   const { cart, getCartTotal, clearCart } = useContext(CartContext);
@@ -60,7 +60,7 @@ export default function PaymentPage() {
         status: "Pending"
       };
 
-      const response = await axios.post("/api/orders", orderData);
+      const response = await API.post("/orders", orderData);
       
       // FIX: The backend returns the object directly, not wrapped in 'order'
       const orderId = response.data._id;

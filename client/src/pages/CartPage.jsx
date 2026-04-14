@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
-import axios from "axios";
+import API from "../api/api";
 import { Trash2, ShoppingBag, MapPin, Plus, Minus, Tag, Clock, ArrowRight, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";

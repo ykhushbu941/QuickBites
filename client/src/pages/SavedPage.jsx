@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import axios from "axios";
+import API from "../api/api";
 import { CartContext } from "../context/CartContext";
 import { Bookmark, Plus, ArrowLeft, Video } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,7 +17,7 @@ export default function SavedPage() {
 
   const fetchSavedFoods = async () => {
     try {
-      const res = await axios.get("/api/auth/user/me");
+      const res = await API.get("/auth/user/me");
       setFoods(res.data.savedFoods || []);
     } catch (err) {
       console.error("Failed to fetch saved foods", err);
@@ -29,7 +29,7 @@ export default function SavedPage() {
   const removeSaved = async (id, e) => {
     e.stopPropagation();
     try {
-      await axios.put(`/api/auth/user/save/${id}`);
+      await API.put(`/auth/user/save/${id}`);
       setFoods(foods.filter(f => f._id !== id));
     } catch (err) {
       console.error("Failed to remove saved food");
