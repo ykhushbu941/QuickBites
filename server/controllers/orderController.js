@@ -3,7 +3,8 @@ const { db, newId } = require("../db");
 function enrichOrder(order) {
   if (!order) return null;
   const items = (order.items || []).map(item => {
-    const food = db.get("foods").find({ id: item.foodId }).value();
+    const foodId = item.foodId || item.food;
+    const food = db.get("foods").find({ id: foodId }).value();
     return { ...item, food: food ? { ...food, _id: food.id } : null };
   });
   const user = db.get("users").find({ id: order.userId }).value();

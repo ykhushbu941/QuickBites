@@ -58,9 +58,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="h-screen w-full flex flex-col justify-center items-center bg-[var(--bg-primary)]">
+        <div className="w-12 h-12 border-4 border-[var(--brand-orange)] border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-[var(--text-secondary)] font-bold animate-pulse">Initializing ReelBite...</p>
+      </div>
+    );
+  }
+
   return (
     <AuthContext.Provider value={{ token, role, user, loading, login, logout, updateSavedFoods, fetchUser }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
