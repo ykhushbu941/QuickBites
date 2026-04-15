@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const { db, initDb } = require("./db");
+const mongoose = require("mongoose");
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
@@ -28,32 +28,57 @@ app.use((req, res, next) => {
   next();
 });
 
-// 🗄️ Initialise Local JSON Database (seeds data if empty)
-initDb();
+// 🗄️ Connect to MongoDB
+const MONGODB_URI = process.env.MONGODB_URI;
 
-// 🔍 Enhanced Health Check & Diagnostics
-app.get("/", (req, res) => {
+if (!MONGODB_URI) {
+  console.error("❌ CRITICAL: MONGODB_URI is not set in environment variables!");
+  console.log("💡 Set MONGODB_URI in your Render dashboard or .env file");
+} else {
+  mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(async () => {
+    console.log("✅ MongoDB Connected!");
+    // Run seeder after connection
+    const { seedData } = require("./seeder");
+    await seedData();
+  })
+  .catch(err => {
+    console.error("❌ MongoDB connection failed:", err.message);
+  });
+}
+
+// 🔍 Health Check & Diagnostics
+app.get("/", async (req, res) => {
   try {
-    const dbInstance = require("./db").db;
-    const dbState = dbInstance ? dbInstance.getState() : null;
+    const dbState = mongoose.connection.readyState;
+    const dbStateLabel = ["disconnected", "connected", "connecting", "disconnecting"][dbState] || "unknown";
+    
+    let userCount = 0;
+    let foodCount = 0;
+    try {
+      const User = require("./models/User");
+      const Food = require("./models/Food");
+      userCount = await User.countDocuments();
+      foodCount = await Food.countDocuments();
+    } catch(e) { /* ignore if models not ready */ }
+
     res.json({
       msg: "🚀 ReelBite API is Live!",
       status: "Operational",
       environment: process.env.NODE_ENV || "development",
       render: !!process.env.RENDER,
       diagnostics: {
-        dbReady: !!dbInstance,
-        dbSize: dbState ? Object.keys(dbState).length : 0,
-        userCount: dbState?.users?.length || 0,
-        foodCount: dbState?.foods?.length || 0,
+        dbReady: dbState === 1,
+        dbStatus: dbStateLabel,
+        userCount,
+        foodCount,
         hasJwtSecret: !!process.env.JWT_SECRET,
-        authRoutes: true,
+        hasMongoUri: !!process.env.MONGODB_URI,
         nodeVersion: process.version,
         uptime: Math.round(process.uptime()) + "s"
-      },
-      headers: {
-        host: req.headers.host,
-        userAgent: req.headers["user-agent"]
       },
       time: new Date().toISOString()
     });
@@ -61,9 +86,6 @@ app.get("/", (req, res) => {
     res.status(500).json({ msg: "Diagnostic check failed", error: err.message });
   }
 });
-
-// Remove the old /api/debug endpoint as it's now part of root /
-// app.get("/api/debug", ...);
 
 // 🛡️ Global Crash Protection
 process.on("unhandledRejection", (reason, promise) => {

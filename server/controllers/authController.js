@@ -1,42 +1,33 @@
-const { db, newId } = require("../db");
+const User = require("../models/User");
+const Food = require("../models/Food");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   try {
     const { name, email, password, role, phone, address } = req.body;
+    console.log(`📝 Register attempt: ${email}`);
 
-    const existing = db.get("users").find({ email }).value();
+    const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ msg: "User already exists" });
 
     const hashed = await bcrypt.hash(password, 10);
-    const userId = newId();
-
-    // 🕒 Tiny delay to stabilize persistent connection/file handle
-    await new Promise(resolve => setTimeout(resolve, 150));
-    const user = {
-      id: userId,
-      _id: userId, // Physically save _id in the DB
+    const user = await User.create({
       name,
       email,
       password: hashed,
       role: role || "user",
       phone: phone || "",
       address: address || "",
-      savedFoods: [],
-      createdAt: new Date().toISOString()
-    };
+      savedFoods: []
+    });
 
-    console.log(`✅ Saving user to DB: ${email}`);
-    db.get("users").push(user).write();
-    res.json({ msg: "Registered", user });
+    console.log(`✅ Registered: ${email}`);
+    const { password: _, ...safeUser } = user.toObject();
+    res.json({ msg: "Registered", user: { ...safeUser, id: user._id.toString(), _id: user._id.toString() } });
   } catch (err) {
     console.error(`❌ Registration Error: ${err.stack}`);
-    res.status(500).json({ 
-      msg: "Error registering", 
-      error: err.message,
-      stack: process.env.NODE_ENV === "development" ? err.stack : undefined
-    });
+    res.status(500).json({ msg: "Error registering", error: err.message });
   }
 };
 
@@ -44,60 +35,50 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log(`🔑 Login attempt: ${email}`);
-    
-    // 🕒 Tiny delay to prevent resource contention
-    await new Promise(resolve => setTimeout(resolve, 150));
-    
-    const user = db.get("users").find({ email }).value();
+
+    const user = await User.findOne({ email });
     if (!user) {
       console.log(`❌ Login failed: User ${email} not found`);
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    let isMatch = await bcrypt.compare(password, user.password).catch(() => false);
-    if (!isMatch && password === user.password) isMatch = true;
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       console.log(`❌ Login failed: Password mismatch for ${email}`);
       return res.status(400).json({ msg: "Invalid credentials" });
     }
-    
-    console.log(`✅ Login successful for: ${email}`);
+
+    console.log(`✅ Login successful for: ${email} (role: ${user.role})`);
 
     const secret = process.env.JWT_SECRET || "fallback_secret_for_emergency";
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user._id.toString(), role: user.role },
       secret,
       { expiresIn: "30d" }
     );
 
-    res.json({ 
-      token, 
-      role: user.role, 
-      user: { ...user, _id: user.id, id: user.id } 
+    const { password: _, ...safeUser } = user.toObject();
+    res.json({
+      token,
+      role: user.role,
+      user: { ...safeUser, id: user._id.toString(), _id: user._id.toString() }
     });
   } catch (err) {
     console.error(`❌ Login Error: ${err.stack}`);
-    res.status(500).json({ 
-      msg: "Error logging in", 
-      error: err.message,
-      stack: process.env.NODE_ENV === "development" ? err.stack : undefined
-    });
+    res.status(500).json({ msg: "Error logging in", error: err.message });
   }
 };
 
 exports.getMe = async (req, res) => {
   try {
-    const user = db.get("users").find({ id: req.user.id }).value();
+    const user = await User.findById(req.user.id).lean();
     if (!user) return res.status(404).json({ msg: "User not found" });
 
     // Populate savedFoods
-    const savedFoods = (user.savedFoods || []).map(fid => {
-      const f = db.get("foods").find({ id: fid }).value();
-      return f ? { ...f, _id: f.id } : null;
-    }).filter(Boolean);
+    const savedFoods = await Food.find({ _id: { $in: user.savedFoods || [] } }).lean();
 
     const { password, ...safeUser } = user;
-    res.json({ ...safeUser, _id: user.id, savedFoods });
+    res.json({ ...safeUser, id: user._id.toString(), _id: user._id.toString(), savedFoods });
   } catch (err) {
     res.status(500).json({ msg: "Error fetching user profile", error: err.message });
   }
@@ -105,21 +86,20 @@ exports.getMe = async (req, res) => {
 
 exports.toggleSaveFood = async (req, res) => {
   try {
-    const user = db.get("users").find({ id: req.user.id }).value();
+    const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ msg: "User not found" });
 
     const foodId = req.params.id;
-    let savedFoods = [...(user.savedFoods || [])];
-    const idx = savedFoods.indexOf(foodId);
+    const idx = user.savedFoods.indexOf(foodId);
 
     if (idx > -1) {
-      savedFoods.splice(idx, 1);
+      user.savedFoods.splice(idx, 1);
     } else {
-      savedFoods.push(foodId);
+      user.savedFoods.push(foodId);
     }
 
-    db.get("users").find({ id: req.user.id }).assign({ savedFoods }).write();
-    res.json({ savedFoods });
+    await user.save();
+    res.json({ savedFoods: user.savedFoods });
   } catch (err) {
     res.status(500).json({ msg: "Error toggling saved food", error: err.message });
   }
@@ -128,7 +108,7 @@ exports.toggleSaveFood = async (req, res) => {
 exports.checkRole = async (req, res) => {
   try {
     const { email } = req.query;
-    const user = db.get("users").find({ email }).value();
+    const user = await User.findOne({ email }).lean();
     if (!user) return res.json({ role: null });
     res.json({ role: user.role });
   } catch (err) {
@@ -139,7 +119,7 @@ exports.checkRole = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const { name, phone, address } = req.body;
-    db.get("users").find({ id: req.user.id }).assign({ name, phone, address }).write();
+    await User.findByIdAndUpdate(req.user.id, { name, phone, address });
     res.json({ msg: "Profile updated" });
   } catch (err) {
     res.status(500).json({ msg: "Error updating profile", error: err.message });

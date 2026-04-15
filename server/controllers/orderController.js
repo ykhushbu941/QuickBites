@@ -1,119 +1,139 @@
-const { db, newId } = require("../db");
+const Order = require("../models/Order");
+const Food = require("../models/Food");
+const User = require("../models/User");
 
-function enrichOrder(order) {
+async function enrichOrder(order) {
   if (!order) return null;
-  const items = (order.items || []).map(item => {
+  const obj = order.toObject ? order.toObject() : order;
+
+  const items = await Promise.all((obj.items || []).map(async (item) => {
     const foodId = item.foodId || item.food;
-    const food = db.get("foods").find({ id: foodId }).value();
-    return { ...item, food: food ? { ...food, _id: food.id } : null };
-  });
-  const user = db.get("users").find({ id: order.userId }).value();
+    let food = null;
+    if (foodId) {
+      try {
+        food = await Food.findById(foodId).lean();
+      } catch (e) { /* ignore invalid id */ }
+    }
+    return { ...item, food: food ? { ...food, _id: food._id.toString(), id: food._id.toString() } : null };
+  }));
+
+  let user = null;
+  try {
+    user = await User.findById(obj.userId).lean();
+  } catch (e) { /* ignore */ }
+
   return {
-    ...order,
-    _id: order.id,
-    user: user ? { _id: user.id, id: user.id, name: user.name, phone: user.phone, address: user.address, email: user.email } : { _id: order.userId },
-    items
+    ...obj,
+    _id: obj._id?.toString(),
+    id: obj._id?.toString(),
+    items,
+    user: user ? { ...user, _id: user._id.toString(), id: user._id.toString() } : null
   };
 }
 
-// ✅ PLACE ORDER
-exports.placeOrder = async (req, res) => {
+// ✅ CREATE ORDER
+exports.createOrder = async (req, res) => {
   try {
     const { items, totalAmount, deliveryAddress, paymentMethod, onlinePaymentDetails } = req.body;
-    if (!items || items.length === 0) return res.status(400).json({ msg: "No order items" });
 
-    const order = {
-      id: newId(),
+    if (!items?.length || !totalAmount || !deliveryAddress) {
+      return res.status(400).json({ msg: "Missing required order fields" });
+    }
+
+    const order = await Order.create({
       userId: req.user.id,
       items,
       totalAmount,
-      status: "Pending",
       deliveryAddress,
       paymentMethod: paymentMethod || "cod",
       onlinePaymentDetails: onlinePaymentDetails || {},
-      createdAt: new Date().toISOString()
-    };
+      status: "Pending"
+    });
 
-    db.get("orders").push(order).write();
-    res.status(201).json(enrichOrder(order));
+    const enriched = await enrichOrder(order);
+    res.status(201).json(enriched);
   } catch (err) {
-    res.status(500).json({ msg: "Error placing order", error: err.message });
+    res.status(500).json({ msg: "Error creating order", error: err.message });
   }
 };
 
-// ✅ GET USER ORDERS
-exports.getUserOrders = async (req, res) => {
+// ✅ GET USER'S OWN ORDERS
+exports.getMyOrders = async (req, res) => {
   try {
-    const orders = db.get("orders")
-      .filter({ userId: req.user.id })
-      .value()
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    res.json(orders.map(enrichOrder));
+    const orders = await Order.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    const enriched = await Promise.all(orders.map(enrichOrder));
+    res.json(enriched);
   } catch (err) {
     res.status(500).json({ msg: "Error fetching orders", error: err.message });
   }
 };
 
-// ✅ UPDATE ORDER STATUS
+// ✅ GET ALL ORDERS (Partner Only)
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    const enriched = await Promise.all(orders.map(enrichOrder));
+    res.json(enriched);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching all orders", error: err.message });
+  }
+};
+
+// ✅ GET A SINGLE ORDER BY ID
+exports.getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ msg: "Order not found" });
+
+    if (order.userId.toString() !== req.user.id && req.user.role !== "partner") {
+      return res.status(403).json({ msg: "Access denied" });
+    }
+
+    const enriched = await enrichOrder(order);
+    res.json(enriched);
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching order", error: err.message });
+  }
+};
+
+// ✅ UPDATE ORDER STATUS (Partner Only)
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const order = db.get("orders").find({ id: req.params.id }).value();
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
     if (!order) return res.status(404).json({ msg: "Order not found" });
 
-    db.get("orders").find({ id: req.params.id }).assign({ status }).write();
-    const updated = db.get("orders").find({ id: req.params.id }).value();
-    res.json(enrichOrder(updated));
+    const enriched = await enrichOrder(order);
+    res.json(enriched);
   } catch (err) {
     res.status(500).json({ msg: "Error updating order status", error: err.message });
   }
 };
 
-// ✅ CANCEL ORDER
+// ✅ CANCEL ORDER (User can cancel their own Pending orders)
 exports.cancelOrder = async (req, res) => {
   try {
-    const order = db.get("orders").find({ id: req.params.id, userId: req.user.id }).value();
+    const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ msg: "Order not found" });
-    if (order.status !== "Pending") return res.status(400).json({ msg: "Only Pending orders can be cancelled." });
 
-    db.get("orders").find({ id: req.params.id }).assign({ status: "Cancelled" }).write();
-    const updated = db.get("orders").find({ id: req.params.id }).value();
-    res.json(enrichOrder(updated));
+    if (order.userId.toString() !== req.user.id) {
+      return res.status(403).json({ msg: "Access denied" });
+    }
+
+    if (order.status !== "Pending") {
+      return res.status(400).json({ msg: "Only pending orders can be cancelled" });
+    }
+
+    order.status = "Cancelled";
+    await order.save();
+
+    const enriched = await enrichOrder(order);
+    res.json(enriched);
   } catch (err) {
     res.status(500).json({ msg: "Error cancelling order", error: err.message });
-  }
-};
-
-// ✅ GET PARTNER ORDERS
-exports.getPartnerOrders = async (req, res) => {
-  try {
-    const allOrders = db.get("orders").value()
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    const partnerOrders = allOrders.filter(order =>
-      (order.items || []).some(item => {
-        const food = db.get("foods").find({ id: item.foodId }).value();
-        return food && food.createdBy === req.user.id;
-      })
-    );
-
-    res.json(partnerOrders.map(enrichOrder));
-  } catch (err) {
-    res.status(500).json({ msg: "Error fetching partner orders", error: err.message });
-  }
-};
-
-// ✅ GET ORDER BY ID
-exports.getOrderById = async (req, res) => {
-  try {
-    const order = db.get("orders").find({ id: req.params.id }).value();
-    if (!order) return res.status(404).json({ msg: "Order not found" });
-    if (order.userId !== req.user.id && req.user.role !== "partner") {
-      return res.status(403).json({ msg: "Not authorized to view this order" });
-    }
-    res.json(enrichOrder(order));
-  } catch (err) {
-    res.status(500).json({ msg: "Error fetching order details", error: err.message });
   }
 };

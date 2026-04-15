@@ -1,9 +1,5 @@
-const { db, newId } = require("../db");
-
-function parseFood(f) {
-  if (!f) return null;
-  return { ...f, _id: f.id };
-}
+const Food = require("../models/Food");
+const User = require("../models/User");
 
 // ✅ GET FOODS (Pagination + Filters)
 exports.getFoods = async (req, res) => {
@@ -15,27 +11,26 @@ exports.getFoods = async (req, res) => {
     const cuisine = req.query.cuisine && req.query.cuisine !== "All" ? req.query.cuisine : null;
     const isVeg = req.query.isVeg;
 
-    let foods = db.get("foods").value();
+    const query = {};
 
-    // Sort newest first
-    foods = [...foods].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    // Apply filters
     if (keyword) {
-      foods = foods.filter(f =>
-        f.name.toLowerCase().includes(keyword) ||
-        f.restaurant.toLowerCase().includes(keyword)
-      );
+      query.$or = [
+        { name: { $regex: keyword, $options: "i" } },
+        { restaurant: { $regex: keyword, $options: "i" } }
+      ];
     }
-    if (category) foods = foods.filter(f => f.category === category);
-    if (cuisine) foods = foods.filter(f => f.cuisine === cuisine);
-    if (isVeg === "true") foods = foods.filter(f => f.isVeg === true);
-    if (isVeg === "false") foods = foods.filter(f => f.isVeg === false);
+    if (category) query.category = category;
+    if (cuisine) query.cuisine = cuisine;
+    if (isVeg === "true") query.isVeg = true;
+    if (isVeg === "false") query.isVeg = false;
 
-    // Paginate
-    const paginated = foods.slice((page - 1) * limit, page * limit);
+    const foods = await Food.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
 
-    res.json(paginated.map(parseFood));
+    res.json(foods.map(f => ({ ...f, _id: f._id.toString(), id: f._id.toString() })));
   } catch (err) {
     res.status(500).json({ msg: "Error fetching foods", error: err.message });
   }
@@ -44,18 +39,17 @@ exports.getFoods = async (req, res) => {
 // ✅ LIKE / UNLIKE (Toggle)
 exports.likeFood = async (req, res) => {
   try {
-    const food = db.get("foods").find({ id: req.params.id }).value();
+    const food = await Food.findById(req.params.id);
     if (!food) return res.status(404).json({ msg: "Food not found" });
 
     const userId = req.user.id;
-    let likes = [...(food.likes || [])];
-    const idx = likes.indexOf(userId);
-    if (idx > -1) likes.splice(idx, 1);
-    else likes.push(userId);
+    const idx = food.likes.indexOf(userId);
+    if (idx > -1) food.likes.splice(idx, 1);
+    else food.likes.push(userId);
 
-    db.get("foods").find({ id: req.params.id }).assign({ likes }).write();
-    const updated = db.get("foods").find({ id: req.params.id }).value();
-    res.json(parseFood(updated));
+    await food.save();
+    const updated = food.toObject();
+    res.json({ ...updated, _id: updated._id.toString(), id: updated._id.toString() });
   } catch (err) {
     res.status(500).json({ msg: "Error liking food", error: err.message });
   }
@@ -69,8 +63,7 @@ exports.addFood = async (req, res) => {
       return res.status(400).json({ msg: "All required fields must be filled" });
     }
 
-    const food = {
-      id: newId(),
+    const food = await Food.create({
       name,
       videoUrl,
       imageUrl: imageUrl || "",
@@ -83,12 +76,11 @@ exports.addFood = async (req, res) => {
       cuisine: cuisine || "Other",
       createdBy: req.user.id,
       likes: [],
-      comments: [],
-      createdAt: new Date().toISOString()
-    };
+      comments: []
+    });
 
-    db.get("foods").push(food).write();
-    res.status(201).json(parseFood(food));
+    const obj = food.toObject();
+    res.status(201).json({ ...obj, _id: obj._id.toString(), id: obj._id.toString() });
   } catch (err) {
     res.status(500).json({ msg: "Error adding food", error: err.message });
   }
@@ -97,11 +89,11 @@ exports.addFood = async (req, res) => {
 // ✅ DELETE FOOD (Only Owner)
 exports.deleteFood = async (req, res) => {
   try {
-    const food = db.get("foods").find({ id: req.params.id }).value();
+    const food = await Food.findById(req.params.id);
     if (!food) return res.status(404).json({ msg: "Food not found" });
-    if (food.createdBy !== req.user.id) return res.status(403).json({ msg: "Not authorized" });
+    if (food.createdBy.toString() !== req.user.id) return res.status(403).json({ msg: "Not authorized" });
 
-    db.get("foods").remove({ id: req.params.id }).write();
+    await food.deleteOne();
     res.json({ msg: "Food deleted successfully" });
   } catch (err) {
     res.status(500).json({ msg: "Error deleting food", error: err.message });
@@ -111,21 +103,21 @@ exports.deleteFood = async (req, res) => {
 // ✅ ADD COMMENT
 exports.addComment = async (req, res) => {
   try {
-    const food = db.get("foods").find({ id: req.params.id }).value();
+    const food = await Food.findById(req.params.id);
     if (!food) return res.status(404).json({ msg: "Food not found" });
+
     const { text } = req.body;
     if (!text) return res.status(400).json({ msg: "Comment text is required" });
 
-    const user = db.get("users").find({ id: req.user.id }).value();
-    const comments = [...(food.comments || [])];
-    comments.push({
+    const user = await User.findById(req.user.id).lean();
+    food.comments.push({
       user: { id: req.user.id, name: user ? user.name : "User" },
       text,
-      createdAt: new Date().toISOString()
+      createdAt: new Date()
     });
 
-    db.get("foods").find({ id: req.params.id }).assign({ comments }).write();
-    res.status(201).json(comments);
+    await food.save();
+    res.status(201).json(food.comments);
   } catch (err) {
     res.status(500).json({ msg: "Error adding comment", error: err.message });
   }
