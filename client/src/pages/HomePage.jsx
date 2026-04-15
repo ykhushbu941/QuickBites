@@ -14,7 +14,7 @@ const CUISINES = ["All", "Indian", "South Indian", "Chinese", "Italian", "Mexica
 const CUISINE_ICONS = {
   All: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=300&auto=format&fit=crop",
   "Indian": "https://images.unsplash.com/photo-1585937421612-70a008356fbe?q=80&w=300&auto=format&fit=crop",
-  "South Indian": "https://images.unsplash.com/photo-1589301760014-d929f3979bdb?q=80&w=300&auto=format&fit=crop",
+  "South Indian": "https://unsplash.com/photos/a-plate-of-food-5oF7d_hPJG4",
   "Chinese": "https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=300&auto=format&fit=crop",
   "Italian": "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?q=80&w=300&auto=format&fit=crop",
   "Mexican": "https://unsplash.com/photos/a-table-topped-with-three-tacos-covered-in-toppings-C74LxnNDL5w",
