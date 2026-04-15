@@ -33,22 +33,33 @@ initDb();
 
 // 🔍 Enhanced Health Check & Diagnostics
 app.get("/", (req, res) => {
-  const dbState = db ? db.getState() : null;
-  res.json({
-    msg: "🚀 ReelBite API Running!",
-    environment: process.env.NODE_ENV || "unknown",
-    render: !!process.env.RENDER,
-    diagnostics: {
-      dbReady: !!db,
-      dbSize: dbState ? Object.keys(dbState).length : 0,
-      userCount: dbState?.users?.length || 0,
-      foodCount: dbState?.foods?.length || 0,
-      hasJwtSecret: !!process.env.JWT_SECRET,
-      nodeVersion: process.version,
-      uptime: process.uptime()
-    },
-    time: new Date().toISOString()
-  });
+  try {
+    const dbInstance = require("./db").db;
+    const dbState = dbInstance ? dbInstance.getState() : null;
+    res.json({
+      msg: "🚀 ReelBite API is Live!",
+      status: "Operational",
+      environment: process.env.NODE_ENV || "development",
+      render: !!process.env.RENDER,
+      diagnostics: {
+        dbReady: !!dbInstance,
+        dbSize: dbState ? Object.keys(dbState).length : 0,
+        userCount: dbState?.users?.length || 0,
+        foodCount: dbState?.foods?.length || 0,
+        hasJwtSecret: !!process.env.JWT_SECRET,
+        authRoutes: true,
+        nodeVersion: process.version,
+        uptime: Math.round(process.uptime()) + "s"
+      },
+      headers: {
+        host: req.headers.host,
+        userAgent: req.headers["user-agent"]
+      },
+      time: new Date().toISOString()
+    });
+  } catch (err) {
+    res.status(500).json({ msg: "Diagnostic check failed", error: err.message });
+  }
 });
 
 // Remove the old /api/debug endpoint as it's now part of root /

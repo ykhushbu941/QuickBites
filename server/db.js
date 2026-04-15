@@ -8,13 +8,23 @@ const isProd = process.env.NODE_ENV === "production" || process.env.RENDER;
 const dbPath = isProd ? path.join("/tmp", "db.json") : path.join(__dirname, "db.json");
 
 const adapter = new FileSync(dbPath);
-const db = low(adapter);
+let db;
 
-const DB_VERSION = "v4"; // Bump to force re-seed on production
-
-// ─── Set Defaults ─────────────────────────────────────────────────
 function initDb() {
   try {
+    console.log(`📂 DB Location: ${dbPath}`);
+    
+    // Ensure parent directory exists in development
+    if (!isProd) {
+      const fs = require("fs");
+      const dirname = path.dirname(dbPath);
+      if (!fs.existsSync(dirname)) {
+        fs.mkdirSync(dirname, { recursive: true });
+        console.log(`📁 Created directory: ${dirname}`);
+      }
+    }
+
+    db = low(adapter);
     db.defaults({ version: "v1", users: [], foods: [], orders: [], reviews: [] }).write();
 
     const currentVersion = db.get("version").value();
@@ -134,4 +144,8 @@ function seedData(forceOverwrite = false) {
   console.log("🔑 Partner login: partner@reelbite.com / 12345");
 }
 
-module.exports = { db, initDb, newId };
+module.exports = { 
+  get db() { return db; }, 
+  initDb, 
+  newId 
+};
