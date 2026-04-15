@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { protect, isPartner } = require("../middleware/authMiddleware");
+const { protect, isPartner, requireDb } = require("../middleware/authMiddleware");
 
 const {
   getFoods,
@@ -8,6 +8,8 @@ const {
   deleteFood,
   addComment
 } = require("../controllers/foodController");
+
+router.use(requireDb);
 
 router.get("/", getFoods);
 router.post("/like/:id", protect, likeFood);

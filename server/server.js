@@ -28,72 +28,67 @@ app.use((req, res, next) => {
   next();
 });
 
-// 🗄️ Connect to MongoDB
+// 🗄️ Connect to MongoDB (non-blocking startup)
+let dbConnected = false;
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  console.error("❌ CRITICAL: MONGODB_URI is not set in environment variables!");
-  console.log("💡 Set MONGODB_URI in your Render dashboard or .env file");
+  console.error("⚠️  WARNING: MONGODB_URI is not set. Database features will be unavailable.");
+  console.log("💡 Add MONGODB_URI in your Render environment variables to enable persistent storage.");
 } else {
-  mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(async () => {
-    console.log("✅ MongoDB Connected!");
-    // Run seeder after connection
-    const { seedData } = require("./seeder");
-    await seedData();
-  })
-  .catch(err => {
-    console.error("❌ MongoDB connection failed:", err.message);
-  });
+  mongoose.connect(MONGODB_URI)
+    .then(async () => {
+      dbConnected = true;
+      console.log("✅ MongoDB Connected!");
+      const { seedData } = require("./seeder");
+      await seedData();
+    })
+    .catch(err => {
+      console.error("❌ MongoDB connection failed:", err.message);
+    });
 }
 
-// 🔍 Health Check & Diagnostics
+// 🔍 Health Check
 app.get("/", async (req, res) => {
-  try {
-    const dbState = mongoose.connection.readyState;
-    const dbStateLabel = ["disconnected", "connected", "connecting", "disconnecting"][dbState] || "unknown";
-    
-    let userCount = 0;
-    let foodCount = 0;
+  const dbState = mongoose.connection.readyState;
+  const dbStateLabel = ["disconnected", "connected", "connecting", "disconnecting"][dbState] || "unknown";
+
+  let userCount = 0;
+  let foodCount = 0;
+  if (dbState === 1) {
     try {
       const User = require("./models/User");
       const Food = require("./models/Food");
       userCount = await User.countDocuments();
       foodCount = await Food.countDocuments();
-    } catch(e) { /* ignore if models not ready */ }
-
-    res.json({
-      msg: "🚀 ReelBite API is Live!",
-      status: "Operational",
-      environment: process.env.NODE_ENV || "development",
-      render: !!process.env.RENDER,
-      diagnostics: {
-        dbReady: dbState === 1,
-        dbStatus: dbStateLabel,
-        userCount,
-        foodCount,
-        hasJwtSecret: !!process.env.JWT_SECRET,
-        hasMongoUri: !!process.env.MONGODB_URI,
-        nodeVersion: process.version,
-        uptime: Math.round(process.uptime()) + "s"
-      },
-      time: new Date().toISOString()
-    });
-  } catch (err) {
-    res.status(500).json({ msg: "Diagnostic check failed", error: err.message });
+    } catch(e) {}
   }
+
+  res.json({
+    msg: "🚀 ReelBite API is Live!",
+    status: dbState === 1 ? "Operational" : "⚠️ DB not connected",
+    environment: process.env.NODE_ENV || "development",
+    render: !!process.env.RENDER,
+    diagnostics: {
+      dbReady: dbState === 1,
+      dbStatus: dbStateLabel,
+      hasMongoUri: !!process.env.MONGODB_URI,
+      userCount,
+      foodCount,
+      hasJwtSecret: !!process.env.JWT_SECRET,
+      nodeVersion: process.version,
+      uptime: Math.round(process.uptime()) + "s"
+    },
+    time: new Date().toISOString()
+  });
 });
 
 // 🛡️ Global Crash Protection
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+process.on("unhandledRejection", (reason) => {
+  console.error("❌ Unhandled Rejection:", reason);
 });
-
 process.on("uncaughtException", (err) => {
-  console.error("❌ Uncaught Exception:", err);
+  console.error("❌ Uncaught Exception:", err.message);
 });
 
 // 🔐 API Routes

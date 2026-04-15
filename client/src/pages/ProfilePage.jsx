@@ -14,7 +14,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await API.get("/orders");
+        const res = await API.get("/orders/my");
         setOrders(res.data);
       } catch (err) {
         console.error("Failed to fetch orders");
